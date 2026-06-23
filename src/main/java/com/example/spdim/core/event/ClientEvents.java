@@ -1,9 +1,11 @@
 package com.example.spdim.core.event;
 
 import com.example.spdim.core.Artifact;
+import com.example.spdim.core.artifact.DriedRose;
 import com.example.spdim.core.data_structure.IntVec2;
 import com.example.spdim.core.mechanic.Rooted;
 import com.example.spdim.core.mechanic.TickFreeze;
+import com.example.spdim.core.mechanic.Taunt;
 import com.example.spdim.core.wand.EnergyWand;
 
 import net.minecraft.client.Minecraft;
@@ -14,6 +16,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+
+import net.minecraft.server.level.ServerLevel;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
@@ -36,7 +41,11 @@ public class ClientEvents {
     private static final Map<IntVec2, String> wandInventoryRenderCache = new HashMap<>();
     private static final Map<IntVec2, String> wandHotBarRenderCache = new HashMap<>();
     private static final Set<IntVec2> artifactInventoryRenderCache = new HashSet<>();
+    private static final Map<IntVec2, Float> artifactInventoryRenderTauntCache = new HashMap<>();
+    private static final Map<IntVec2, Boolean> artifactInventoryRenderIsOnCache = new HashMap<>();
     private static final Set<IntVec2> artifactHotBarRenderCache = new HashSet<>();
+    private static final Map<IntVec2, Float> artifactHotBarRenderTauntCache = new HashMap<>();
+    private static final Map<IntVec2, Boolean> artifactHotBarRenderIsOnCache = new HashMap<>();
 
     private static final int WIDTH = 16;
     private static final int HEIGHT = 16;
@@ -44,6 +53,8 @@ public class ClientEvents {
     private static void updateInventoryRenderCache(AbstractContainerScreen<?> screen, Player player) {
         wandInventoryRenderCache.clear();
         artifactInventoryRenderCache.clear();
+        artifactInventoryRenderTauntCache.clear();
+        artifactInventoryRenderIsOnCache.clear();
         for (Slot slot : screen.getMenu().slots) {
             if (!(slot.container == player.getInventory())) {
                 continue;
@@ -71,6 +82,18 @@ public class ClientEvents {
                 if (artifact.isApplicable(stack, player.level())) {
                     artifactInventoryRenderCache.add(pos);
                 }
+                if (stack.getItem() instanceof DriedRose rose && rose.getState(stack) == DriedRose.STATE.USING) {
+                    CompoundTag tag = stack.getTag();
+                    if (tag == null) {
+                        continue;
+                    }
+                    IntVec2 tempPos = new IntVec2(x + 0, y + 13);
+                    float energy = Taunt.getEnergyFromUUID(tag.getUUID("SummonedUUID"));
+                    artifactInventoryRenderTauntCache.put(tempPos, energy);
+                    IntVec2 anotherTempPos = new IntVec2(x + 11, y + 1);
+                    boolean isOn = Taunt.getBooleanFromUUID(tag.getUUID("SummonedUUID")); 
+                    artifactInventoryRenderIsOnCache.put(anotherTempPos, isOn);
+                }
             }
         }
     }
@@ -79,6 +102,8 @@ public class ClientEvents {
 
         wandHotBarRenderCache.clear();
         artifactHotBarRenderCache.clear();
+        artifactHotBarRenderTauntCache.clear();
+        artifactHotBarRenderIsOnCache.clear();
 
         Minecraft mc = Minecraft.getInstance();
 
@@ -115,6 +140,18 @@ public class ClientEvents {
                 if (artifact.isApplicable(stack, player.level())) {
                     artifactHotBarRenderCache.add(pos);
                 }
+                if (artifact instanceof DriedRose rose && rose.getState(stack) == DriedRose.STATE.USING) {
+                    CompoundTag tag = stack.getTag();
+                    if (tag == null) {
+                        continue;
+                    }
+                    IntVec2 tempPos = new IntVec2(x + 0, y + 13);
+                    float energy = Taunt.getEnergyFromUUID(tag.getUUID("SummonedUUID"));
+                    artifactHotBarRenderTauntCache.put(tempPos, energy);
+                    IntVec2 anotherTempPos = new IntVec2(x + 11, y + 1);
+                    boolean isOn = Taunt.getBooleanFromUUID(tag.getUUID("SummonedUUID")); 
+                    artifactHotBarRenderIsOnCache.put(anotherTempPos, isOn); 
+                }
             }
         }
     }
@@ -138,6 +175,8 @@ public class ClientEvents {
         } else {
             wandInventoryRenderCache.clear();
             artifactInventoryRenderCache.clear();
+            artifactInventoryRenderTauntCache.clear();
+            artifactInventoryRenderIsOnCache.clear();
         }
     }
 
@@ -182,6 +221,33 @@ public class ClientEvents {
             int y = entry.getY();
             gui.fill(x, y, x + WIDTH, y + HEIGHT, 0x80FF0000);
         }
+        for (Map.Entry<IntVec2, Float> entry : artifactInventoryRenderTauntCache.entrySet()) {
+            gui.pose().pushPose();
+            gui.pose().scale(0.35f, 0.35f, 1); 
+            Float float_value = entry.getValue();
+            if (float_value == null) {
+                continue;
+            }
+            String text = String.format("%.2f", float_value.floatValue());
+            gui.drawString(font, text, entry.getKey().getX() / 0.35f, entry.getKey().getY() / 0.35f, 0xFFFFFF, true);
+            gui.pose().popPose();
+        }
+        for (Map.Entry<IntVec2, Boolean> entry : artifactInventoryRenderIsOnCache.entrySet()) {
+            gui.pose().pushPose();
+            gui.pose().scale(0.35f, 0.35f, 1); 
+            Boolean boolean_value = entry.getValue();
+            if (boolean_value == null) {
+                continue;
+            }
+            boolean isOn = boolean_value.booleanValue();
+            if (isOn) {
+                gui.drawString(font, "ON", entry.getKey().getX() / 0.35f, entry.getKey().getY() / 0.35f, 0xFFFFFF, true);
+						} else {
+                gui.drawString(font, "OFF", entry.getKey().getX() / 0.35f, entry.getKey().getY() / 0.35f, 0xFFFFFF, true);
+            }
+            gui.pose().popPose();
+        }
+ 
     }
 
     @SubscribeEvent
@@ -209,6 +275,33 @@ public class ClientEvents {
             int x = entry.getX();
             int y = entry.getY();
             gui.fill(x, y, x + WIDTH, y + HEIGHT, 0x80FF0000);
+        }        
+        for (Map.Entry<IntVec2, Float> entry : artifactHotBarRenderTauntCache.entrySet()) {
+            gui.pose().pushPose();
+            gui.pose().scale(0.35f, 0.35f, 1);
+            Float float_value = entry.getValue();
+            if (float_value == null) {
+                continue;
+            }
+            String text = String.format("%.2f", float_value.floatValue());
+            gui.drawString(font, text, entry.getKey().getX() / 0.35f, entry.getKey().getY() / 0.35f, 0xFFFFFF, true);
+            gui.pose().popPose();
         }
+        for (Map.Entry<IntVec2, Boolean> entry : artifactHotBarRenderIsOnCache.entrySet()) {
+            gui.pose().pushPose();
+            gui.pose().scale(0.35f, 0.35f, 1); 
+            Boolean boolean_value = entry.getValue();
+            if (boolean_value == null) {
+                continue;
+            }
+            boolean isOn = boolean_value.booleanValue();
+            if (isOn) {
+                gui.drawString(font, "ON", entry.getKey().getX() / 0.35f, entry.getKey().getY() / 0.35f, 0xFFFFFF, true);
+						} else {
+                gui.drawString(font, "OFF", entry.getKey().getX() / 0.35f, entry.getKey().getY() / 0.35f, 0xFFFFFF, true);
+            }
+            gui.pose().popPose();
+        }
+ 
     }
 }

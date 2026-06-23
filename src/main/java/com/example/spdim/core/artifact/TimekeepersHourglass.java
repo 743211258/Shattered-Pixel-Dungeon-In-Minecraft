@@ -61,13 +61,10 @@ public class TimekeepersHourglass extends Artifact {
 
     public void FreezeOthersServerSide(ServerPlayer player) {
         ItemStack stack = player.getOffhandItem();
-        stack.getOrCreateTag();
-        CompoundTag tag = stack.getOrCreateTag();
         if (!isApplicable(stack, player.level())) {
             return;
         }
 
-        tag.putLong("LastChargeTime", player.level().getGameTime());
         Vec3 start = player.getEyePosition(1.0F);
         Vec3 look = player.getLookAngle();
         double range = 50.0;
@@ -83,7 +80,14 @@ public class TimekeepersHourglass extends Artifact {
         );
         if (entityHit != null && entityHit.getEntity() instanceof LivingEntity target && !Untargetable.isUntargetable(target)) {
             TickFreeze.freeze(target, 100);
+        } else {
+            return;
         }
+        CompoundTag tag = stack.getTag();
+        if (tag == null) {
+            return;
+        }
+        tag.putLong("LastChargeTime", player.level().getGameTime());
     }
 
     public void FreezeMyselfClient(Level world, Player player, ItemStack stack) {

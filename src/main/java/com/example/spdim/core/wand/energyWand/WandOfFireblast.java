@@ -16,6 +16,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -23,6 +25,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+
+import net.minecraft.util.Mth;
 
 public class WandOfFireblast extends EnergyWand {
 
@@ -93,14 +97,27 @@ public class WandOfFireblast extends EnergyWand {
                 }
         );
 
-        // Spawn lava on any entity
         for (LivingEntity entity : entities) {
-            BlockPos lavaPos = entity.blockPosition();
-            world.setBlock(
-                    lavaPos,
-                    Blocks.LAVA.defaultBlockState(),
-                    11
-            );
+
+            AABB boxTwo = entity.getBoundingBox();
+            int blockMinX = Mth.floor(boxTwo.minX);
+            int blockMinY = Mth.floor(boxTwo.minY);
+            int blockMinZ = Mth.floor(boxTwo.minZ);
+            int blockMaxX = Mth.floor(boxTwo.maxX);
+            int blockMaxY = Mth.floor(boxTwo.maxY);
+            int blockMaxZ = Mth.floor(boxTwo.maxZ);
+            for (int x = blockMinX; x <= blockMaxX; x++) {
+                for (int y = blockMinY; y <= blockMaxY; y++) {
+                    for (int z = blockMinZ; z <= blockMaxZ; z++) {
+
+                        BlockPos lavaPos = new BlockPos(x, y, z);
+
+                        world.destroyBlock(lavaPos, false);
+                        world.setBlock(lavaPos, Blocks.LAVA.defaultBlockState(), 11);
+                    }
+                }
+            }
+            entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 150, 3));
         }
 
         for (double d = 0; d <= HEIGHT; d += STEP_HEIGHT) {

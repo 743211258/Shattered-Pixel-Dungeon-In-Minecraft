@@ -42,4 +42,7 @@ public class RegenerationDisabled {
         return active.containsKey(entity);
     }
 
+    public static void disableRemove(LivingEntity target) {
+        active.remove(target);
+    }
 }

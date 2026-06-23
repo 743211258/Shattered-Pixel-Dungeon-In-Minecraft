@@ -1,10 +1,13 @@
 package com.example.spdim;
 
+import com.example.spdim.core.artifact.DriedRose;
+import com.example.spdim.core.artifact.MasterThievesArmband;
 import com.example.spdim.core.artifact.ChaliceOfBlood;
 import com.example.spdim.core.artifact.TimekeepersHourglass;
 import com.example.spdim.core.network.MyModNetwork;
 import com.example.spdim.core.wand.energyWand.WandOfFireblast;
 import com.example.spdim.core.wand.energyWand.WandOfRegrowth;
+
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
@@ -65,6 +68,8 @@ public class ExampleMod
     // Register all artifacts
     public static final RegistryObject<Item> TIMEKEEPERS_HOURGLASS = ITEMS.register("timekeepers_hourglass", () -> new TimekeepersHourglass(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> CHALICE_OF_BLOOD = ITEMS.register("chalice_of_blood", () -> new ChaliceOfBlood(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> DRIED_ROSE = ITEMS.register("dried_rose", () -> new DriedRose(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> MASTER_THIEVES_ARMBAND = ITEMS.register("master_thieves_armband", () -> new MasterThievesArmband(new Item.Properties().stacksTo(1)));
 
     // Creates a new food item with the id "examplemod:example_id", nutrition 1 and saturation 2
     public static final RegistryObject<Item> EXAMPLE_ITEM = ITEMS.register("example_item", () -> new Item(new Item.Properties().food(new FoodProperties.Builder()
@@ -81,6 +86,8 @@ public class ExampleMod
                 output.accept(WAND_OF_REGROWTH.get());
                 output.accept(TIMEKEEPERS_HOURGLASS.get());
                 output.accept(CHALICE_OF_BLOOD.get());
+                output.accept(DRIED_ROSE.get());
+                output.accept(MASTER_THIEVES_ARMBAND.get());
             }).build());
     public static final RegistryObject<Item> BLAST_WAVE_ITEM = ITEMS.register("blast_wave_item",
             () -> new Item(new Item.Properties())

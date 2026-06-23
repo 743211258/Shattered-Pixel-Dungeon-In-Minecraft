@@ -42,6 +42,38 @@ public class MyModNetwork {
                 ChaliceOfBloodOnUsePacket::handle,
                 Optional.of(NetworkDirection.PLAY_TO_SERVER)
         );
+
+        CHANNEL.registerMessage(id++, DriedRoseSummonPacket.class,
+                DriedRoseSummonPacket::encode,
+                DriedRoseSummonPacket::decode,
+                DriedRoseSummonPacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER)
+        );
+        CHANNEL.registerMessage(id++, DriedRoseControlPacket.class,
+                DriedRoseControlPacket::encode,
+                DriedRoseControlPacket::decode,
+                DriedRoseControlPacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER)
+        );
+        CHANNEL.registerMessage(id++, DriedRoseTauntPacket.class,
+                DriedRoseTauntPacket::encode,
+                DriedRoseTauntPacket::decode,
+                DriedRoseTauntPacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER)
+        );
+        CHANNEL.registerMessage(id++, DriedRoseTeleportPacket.class,
+                DriedRoseTeleportPacket::encode,
+                DriedRoseTeleportPacket::decode,
+                DriedRoseTeleportPacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER)
+        );
+        CHANNEL.registerMessage(id++, StealPacket.class,
+                StealPacket::encode,
+                StealPacket::decode,
+                StealPacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER)
+        );
+ 
     }
 }
 

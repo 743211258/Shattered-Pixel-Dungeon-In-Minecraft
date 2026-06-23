@@ -17,7 +17,7 @@ import net.minecraft.network.chat.Component;
 
 public class ChaliceOfBlood extends Artifact {
 
-    protected final int EFFECT_DURATION = 1200;
+    protected final int EFFECT_DURATION = 3600;
 
     public ChaliceOfBlood(Properties properties) {
         super(properties);
@@ -53,9 +53,9 @@ public class ChaliceOfBlood extends Artifact {
         player.setHealth(newHealth);
 
         player.hurtMarked = true;
-        player.setAbsorptionAmount(player.getAbsorptionAmount() + 100.0F);
+        player.setAbsorptionAmount(player.getAbsorptionAmount() + 200.0F);
         // Used to deliberately trigger the hurt animation.
-        player.hurt(player.damageSources().fellOutOfWorld(), 5F);
+        player.hurt(player.damageSources().fellOutOfWorld(), 10F);
         // Apply movement speed, damage boost, jump boost, night vision, absorption, damage resistance to the player for one minute.
         MobEffectInstance swiftness = new MobEffectInstance(MobEffects.MOVEMENT_SPEED, EFFECT_DURATION, 1, false, true);
         MobEffectInstance strength = new MobEffectInstance(MobEffects.DAMAGE_BOOST, EFFECT_DURATION, 1, false, true);

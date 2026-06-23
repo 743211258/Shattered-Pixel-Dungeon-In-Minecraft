@@ -9,30 +9,19 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import org.slf4j.Logger;
 
 import java.util.List;
 
 @Mod.EventBusSubscriber(modid = "spdim", bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class TimekeepersHourglassServerEvents {
-    private static final Logger LOGGER = LogUtils.getLogger();
 
     @SubscribeEvent
-    public static void onRightClickEntity(PlayerInteractEvent.EntityInteract event) {
-        // Diable right click if the target is untargetable.
-        if (event.getTarget() instanceof LivingEntity target && Untargetable.isUntargetable(target)) {
-            event.setCanceled(true);
-        }
-    }
-
-    @SubscribeEvent
-    public static void onAttackEntity(AttackEntityEvent event) {
-        // Diable attack if the target is untargetable.
-        if (event.getTarget() instanceof LivingEntity target && Untargetable.isUntargetable(target)) {
+    public static void onLivingBeenAttacked(LivingHurtEvent event) {
+        // Diable any damage if the target is untargetable.
+        if (Untargetable.isUntargetable(event.getEntity())) {
             event.setCanceled(true);
         }
     }

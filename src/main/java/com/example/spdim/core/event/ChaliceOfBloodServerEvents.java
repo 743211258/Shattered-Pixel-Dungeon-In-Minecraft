@@ -1,7 +1,7 @@
 package com.example.spdim.core.event;
 
 import com.example.spdim.core.mechanic.RegenerationDisabled;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -10,11 +10,9 @@ import net.minecraftforge.fml.common.Mod;
 
 public class ChaliceOfBloodServerEvents {
     @SubscribeEvent
-    public static void onPlayerHeal(LivingHealEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer player)) {
-            return;
-        }
-        if (RegenerationDisabled.isDisabled(player)) {
+    public static void onLivingEntityHeal(LivingHealEvent event) {
+        LivingEntity entity = event.getEntity();
+        if (RegenerationDisabled.isDisabled(entity)) {
             event.setCanceled(true);
         }
     }

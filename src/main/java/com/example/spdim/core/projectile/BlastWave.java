@@ -9,6 +9,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.level.ClipContext;
 
@@ -29,7 +30,8 @@ public class BlastWave extends ThrowableProjectile implements ItemSupplier{
 
     private double explodeRadius;
     private static final EntityDataAccessor<Float> EXPLODE_RADIUS = SynchedEntityData.defineId(BlastWave.class, EntityDataSerializers.FLOAT);
-
+    private static double DAMAGE_MULTIPLIER = 1.0F;
+    private static double KNOCKBACK_MULTIPLIER = 0.2F;
 
     public BlastWave(EntityType<? extends ThrowableProjectile> type, Level level) {
         super(type, level);
@@ -162,9 +164,12 @@ public class BlastWave extends ThrowableProjectile implements ItemSupplier{
                 continue;
             }
 
+            double magnitude = 0.0F;
+            if (entity instanceof LivingEntity livingEntity) {
+                magnitude = livingEntity.getAttributeValue(Attributes.ARMOR);
+            }
             DamageSource source = entity.level().damageSources().explosion(this, getOwner());
-            entity.hurt(source, 2);
-
+            entity.hurt(source, (float) (2.0D + magnitude * DAMAGE_MULTIPLIER));
             Vec3 direction = entity.position().subtract(pos);
             double radius = direction.length();
             if (radius > explodeRadius) {
@@ -177,7 +182,7 @@ public class BlastWave extends ThrowableProjectile implements ItemSupplier{
 
 
             double factor = Math.max(0, 1.0 - ((radius / explodeRadius) * (radius / explodeRadius)));
-            Vec3 pushForce = direction.normalize().scale(4 * factor);
+            Vec3 pushForce = direction.normalize().scale((float) ((10.0D - KNOCKBACK_MULTIPLIER * magnitude) * factor));
             if (isBlockedByBlock(pos, entity)) {
                 pushForce = pushForce.scale(0.2);
             }

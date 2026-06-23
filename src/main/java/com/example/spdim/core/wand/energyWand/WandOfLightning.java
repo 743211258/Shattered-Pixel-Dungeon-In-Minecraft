@@ -85,6 +85,7 @@ public class WandOfLightning extends EnergyWand{
             hitPos = entityHit.getLocation();
             if (entityHit.getEntity() instanceof LivingEntity living) {
                 hitEntities.add(living);
+                living.hurt(living.damageSources().magic(), 2.5F);
             }
         } else if (blockDist < Double.MAX_VALUE) {
             hitPos = blockHit.getLocation();
@@ -132,13 +133,13 @@ public class WandOfLightning extends EnergyWand{
         for (LivingEntity e : entities) {
             // Add entities to the hashmap
             hitEntities.add(e);
-
             // Generate lightnings on entities.
             LightningBolt lightning = EntityType.LIGHTNING_BOLT.create(world);
             if (lightning != null) {
                 BlockPos blockPos = getBlockAbove(world, e.position(), player);
                 if (blockPos == null) {
                     lightning.moveTo(e.position());
+                    e.hurt(e.damageSources().magic(), 2.5F);
                 } else {
                     lightning.moveTo(Vec3.atCenterOf(blockPos).add(0, 0.5, 0));
                 }
