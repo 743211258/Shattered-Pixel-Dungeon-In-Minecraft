@@ -127,21 +127,21 @@ public class BlastWave extends ThrowableProjectile implements ItemSupplier{
     @Override
     protected void onHit(HitResult result) {
         if (!this.level().isClientSide) {
-            explode(this.position());
+            explode(result.getLocation());
         }
     }
 
     @Override
     protected void onHitBlock(BlockHitResult result) {
         if (!this.level().isClientSide) {
-            explode(this.position());
+            explode(result.getLocation());
         }
     }
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
         if (!this.level().isClientSide) {
-            explode(this.position());
+            explode(result.getLocation());
         }
     }
     

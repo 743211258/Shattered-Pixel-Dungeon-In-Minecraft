@@ -15,7 +15,7 @@ import net.minecraft.world.phys.Vec3;
 public class WandOfBlastWave extends EnergyWand{
 
     private final float EXPLODING_RADIUS = 5.0F;
-    private final float SPEED = 1.0F;
+    private final float SPEED = 3.0F;
 
     public WandOfBlastWave(Properties properties, int maxEnergy, int energyCost, int cooldown, Component name) {
         super(properties, maxEnergy, energyCost, cooldown, name);
