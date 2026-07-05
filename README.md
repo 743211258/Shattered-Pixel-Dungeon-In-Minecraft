@@ -13,7 +13,9 @@ Source code of Shattered Pixel Dungeon: [Shattered Pixel Dungeon](https://github
 * Artifacts:
   * Timekeeper's Hourglass
   * Chalice of Blood
+  * Dried Rose
+  * Master Thieves' Armband
 
-Description of all items can be found in document.txt.
+Description of the first six items can be found in document.txt.
 
-Official releases are in the release section of the repository.
+Official releases are in the release section of the repository. However, I will only release major updates. Currently the mod version is 0.0.3.9, and I am wrapping up some stuff.
