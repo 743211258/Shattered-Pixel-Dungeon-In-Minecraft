@@ -1,4 +1,10 @@
 {
+  "death.attack.viscosity": "%1$s被延迟伤害杀死了",
+  
+  "enchantment.spdim.viscosity": "粘稠",
+
+	"effect.spdim.viscosity": "延迟伤害",
+
   "item.spdim.wand_of_blast_wave": "冲击波法杖",
   "item.spdim.wand_of_lightning": "雷霆法杖",
   "item.spdim.wand_of_fireblast": "焰浪法杖",

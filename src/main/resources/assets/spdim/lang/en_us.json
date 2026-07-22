@@ -1,4 +1,10 @@
 {
+  "death.attack.viscosity": "%1$s died from viscosity damage",
+	
+  "enchantment.spdim.viscosity": "Viscosity",
+
+	"effect.spdim.viscosity": "Damage Over Time",
+
   "item.spdim.wand_of_blast_wave": "Wand of Blast Wave",
   "item.spdim.wand_of_lightning": "Wand of Lightning",
   "item.spdim.wand_of_fireblast": "Wand of Fireblast",

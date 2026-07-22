@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "com.example.spdim.core.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "spdim.refmap.json",
+  "client": [
+    "ViscosityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

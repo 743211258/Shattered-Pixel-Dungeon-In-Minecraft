@@ -12,9 +12,11 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -38,6 +40,8 @@ import net.minecraft.world.entity.MobCategory;
 import com.example.spdim.core.projectile.BlastWave;
 import com.example.spdim.core.wand.energyWand.WandOfBlastWave;
 import com.example.spdim.core.wand.energyWand.WandOfLightning;
+import com.example.spdim.core.enchantment.Viscosity;
+import com.example.spdim.core.mechanic.ViscosityEffect;
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(ExampleMod.MODID)
 public class ExampleMod
@@ -58,7 +62,10 @@ public class ExampleMod
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
     // Create a Deferred Register to hold Items which will all be registered under the "examplemod" namespace
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
-    // Create a Deferred Register to hold CreativeModeTabs which will all be registered under the "examplemod" namespace
+    public static final DeferredRegister<Enchantment> ENCHANTMENTS = DeferredRegister.create(ForgeRegistries.ENCHANTMENTS, MODID);
+    public static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, MODID);
+
+		// Create a Deferred Register to hold CreativeModeTabs which will all be registered under the "examplemod" namespace
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
     // Register all wands
     public static final RegistryObject<Item> WAND_OF_BLAST_WAVE = ITEMS.register("wand_of_blast_wave", () -> new WandOfBlastWave(new Item.Properties().stacksTo(1), 4, 1, 300, Component.translatable("item.spdim.wand_of_blast_wave")));
@@ -71,6 +78,8 @@ public class ExampleMod
     public static final RegistryObject<Item> DRIED_ROSE = ITEMS.register("dried_rose", () -> new DriedRose(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> MASTER_THIEVES_ARMBAND = ITEMS.register("master_thieves_armband", () -> new MasterThievesArmband(new Item.Properties().stacksTo(1)));
 
+		public static final RegistryObject<Enchantment> VISCOSITY = ENCHANTMENTS.register("viscosity", () -> new Viscosity());
+		public static final RegistryObject<MobEffect> VISCOSITY_EFFECT = EFFECTS.register("viscosity", () -> new ViscosityEffect());
     // Creates a new food item with the id "examplemod:example_id", nutrition 1 and saturation 2
     public static final RegistryObject<Item> EXAMPLE_ITEM = ITEMS.register("example_item", () -> new Item(new Item.Properties().food(new FoodProperties.Builder()
             .alwaysEat().nutrition(1).saturationMod(2f).build())));
@@ -104,6 +113,8 @@ public class ExampleMod
         // Register the Deferred Register to the mod event bus so items get registered
         ITEMS.register(modEventBus);
         // Register the Deferred Register to the mod event bus so tabs get registered
+        ENCHANTMENTS.register(modEventBus); 
+				EFFECTS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
         ENTITY_TYPE.register(modEventBus);
 

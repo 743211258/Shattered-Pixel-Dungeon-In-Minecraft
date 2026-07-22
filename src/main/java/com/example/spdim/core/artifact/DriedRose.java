@@ -29,6 +29,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.MinecraftServer;
 
 import net.minecraft.nbt.CompoundTag;
 
@@ -98,7 +99,22 @@ public class DriedRose extends Artifact {
 			return;
 		}
 		if (getState(stack) == STATE.USING && tag.contains("SummonedUUID")) {
-			Entity summoned = serverLevel.getEntity(tag.getUUID("SummonedUUID"));
+    	MinecraftServer server = serverLevel.getServer();
+			Entity summoned = null;
+			for (ServerLevel level : server.getAllLevels()) {
+				summoned = level.getEntity(tag.getUUID("SummonedUUID"));
+				if (summoned != null) {
+					break;
+				}
+			}
+			boolean isNull = summoned == null;
+	    boolean isAlive = summoned != null && summoned.isAlive();
+    	boolean isRemoved = summoned != null && summoned.isRemoved();
+
+    	System.out.println("summoned == null: " + isNull);
+    	System.out.println("summoned.isAlive(): " + isAlive);
+    	System.out.println("summoned.isRemoved(): " + isRemoved);
+
 			if (summoned == null || !summoned.isAlive() || summoned.isRemoved()) { 
 				onSummonedDeath(stack, world);
 			}

@@ -19,6 +19,8 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+import com.example.spdim.core.mechanic.MixinReference;
+
 @Mod.EventBusSubscriber(modid = "spdim", bus = Mod.EventBusSubscriber.Bus.FORGE)
 
 public class ServerEvents {
@@ -54,5 +56,17 @@ public class ServerEvents {
         tag.putString("title", "Encyclopedia");
         tag.putString("author", "spdim");
         player.getInventory().add(book);
+    }
+
+    @SubscribeEvent
+    public static void onPlayerClone(PlayerEvent.Clone event) {
+        if (!event.isWasDeath()) {
+            return;
+        }
+
+        CompoundTag data = event.getEntity().getPersistentData();
+				MixinReference.renderReference.remove(event.getEntity().getUUID());
+        data.remove("totalDamage");
+        data.remove("ViscosityTick");
     }
 }
