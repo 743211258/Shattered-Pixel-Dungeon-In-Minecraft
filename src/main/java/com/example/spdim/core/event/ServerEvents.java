@@ -18,8 +18,13 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.server.ServerLifecycleHooks;
+import net.minecraft.server.level.ServerPlayer;
 
 import com.example.spdim.core.mechanic.MixinReference;
+import com.example.spdim.core.network.MyModNetwork;
+import com.example.spdim.core.network.SyncViscosityPacket;
 
 @Mod.EventBusSubscriber(modid = "spdim", bus = Mod.EventBusSubscriber.Bus.FORGE)
 
@@ -37,6 +42,21 @@ public class ServerEvents {
 				TargetLock.tick();
 				Summon.tick();
         Taunt.tick();
+				SyncViscosityPacket packet =
+								new SyncViscosityPacket(
+												MixinReference.renderReference,
+												MixinReference.totalDamageRenderReference);
+
+				for (ServerPlayer player :
+								ServerLifecycleHooks.getCurrentServer()
+												.getPlayerList()
+												.getPlayers()) {
+
+						MyModNetwork.CHANNEL.send(
+										PacketDistributor.PLAYER.with(() -> player),
+										packet
+						);
+				}
     }
     @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {

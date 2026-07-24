@@ -8,6 +8,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 
 import com.example.spdim.core.data_structure.ViscosityRender;
+import com.example.spdim.core.data_structure.ViscosityTotalDamageRender;
 import com.example.spdim.core.mechanic.MixinReference;
 import com.example.spdim.core.enchantment.Viscosity;
 import com.example.spdim.core.registry.ModDamageSources;
@@ -72,16 +73,6 @@ public class ViscosityEffect extends MobEffect {
 		float maxHealth = entity.getMaxHealth();
 		float remainingDamage = nextDamage - absorption;
 		remainingDamage = nextDamage - absorption;
-	    // Print the values of these variables before entering the conditional block
-         System.out.println("========== [Debug Damage Calculation] ==========");
-         System.out.println("maxHealth: " + maxHealth);
-         System.out.println("health: " + health);
-         System.out.println("absorption: " + absorption);
-         System.out.println("nextDamage: " + nextDamage);
-         System.out.println("totalDamage: " + totalDamage);
-         System.out.println("remainingDamage: " + remainingDamage);
-         System.out.println("================================================");
-
 		if (remainingDamage <= 0.0F) {
 			float absorptionMin = Mth.ceil(Mth.ceil(maxHealth / 2.0F) + (absorption - nextDamage) / 2.0F);
 			float absorptionMax = Mth.ceil(Mth.ceil(maxHealth / 2.0F) + absorption / 2.0F);
@@ -97,6 +88,23 @@ public class ViscosityEffect extends MobEffect {
 			ViscosityRender render = new ViscosityRender(healthMin, healthMax, absorptionMin, absorptionMax);
 			MixinReference.renderReference.put(entity.getUUID(), render);
 		}
+		remainingDamage = totalDamage - absorption;
+		if (remainingDamage <= 0.0F) {
+			float absorptionMin = Mth.ceil(Mth.ceil(maxHealth / 2.0F) + (absorption - totalDamage) / 2.0F);
+			float absorptionMax = Mth.ceil(Mth.ceil(maxHealth / 2.0F) + absorption / 2.0F);
+			float healthMin = Float.MAX_VALUE;
+			float healthMax = Float.MIN_VALUE;
+			ViscosityTotalDamageRender render = new ViscosityTotalDamageRender(healthMin, healthMax, absorptionMin, absorptionMax);
+			MixinReference.totalDamageRenderReference.put(entity.getUUID(), render);
+		} else {
+			float absorptionMin = Mth.ceil(maxHealth / 2.0F) + 1.0F;
+			float absorptionMax = Mth.ceil(Mth.ceil(maxHealth / 2.0F) + absorption / 2.0F);
+			float healthMin = Mth.ceil((health - remainingDamage) / 2.0F);
+			float healthMax = Mth.ceil(health / 2.0F);
+			ViscosityTotalDamageRender render = new ViscosityTotalDamageRender(healthMin, healthMax, absorptionMin, absorptionMax);
+			MixinReference.totalDamageRenderReference.put(entity.getUUID(), render);
+		}
+
 	}
 
 	@Override

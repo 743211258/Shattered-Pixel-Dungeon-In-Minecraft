@@ -73,7 +73,12 @@ public class MyModNetwork {
                 StealPacket::handle,
                 Optional.of(NetworkDirection.PLAY_TO_SERVER)
         );
- 
+        CHANNEL.registerMessage(id++, SyncViscosityPacket.class,
+                SyncViscosityPacket::encode,
+                SyncViscosityPacket::decode,
+                SyncViscosityPacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT)
+        ); 
     }
 }
 
