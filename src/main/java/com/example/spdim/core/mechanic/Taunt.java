@@ -124,7 +124,7 @@ public class Taunt {
 						LivingEntity.class,
 						box,
 						e -> {
-							if (e == summonedTaunt || Untargetable.isUntargetable(e)) {
+							if (e == summonedTaunt || Invincible.isInvincible(e)) {
 								return false;
 							}
 							CompoundTag tempTag = summonedTaunt.getPersistentData();

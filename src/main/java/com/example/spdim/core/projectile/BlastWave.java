@@ -2,7 +2,7 @@ package com.example.spdim.core.projectile;
 
 import java.util.List;
 
-import com.example.spdim.core.mechanic.Untargetable;
+import com.example.spdim.core.mechanic.Invincible;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -155,7 +155,7 @@ public class BlastWave extends ThrowableProjectile implements ItemSupplier{
         List<Entity> candidates = this.level().getEntitiesOfClass(
                 Entity.class,
                 box,
-                e -> e instanceof LivingEntity living && !Untargetable.isUntargetable(living)
+                e -> e instanceof LivingEntity living && !Invincible.isInvincible(living)
         );
 
         for (Entity entity : candidates) {

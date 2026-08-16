@@ -2,7 +2,7 @@ package com.example.spdim.core.wand.energyWand;
 
 import com.example.spdim.ExampleMod;
 import com.example.spdim.core.mechanic.Rooted;
-import com.example.spdim.core.mechanic.Untargetable;
+import com.example.spdim.core.mechanic.Invincible;
 import com.example.spdim.core.wand.EnergyWand;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -70,7 +70,7 @@ public class WandOfRegrowth extends EnergyWand {
                 collision_box,
                 e -> {
                     if (e == player ||
-                            Untargetable.isUntargetable(e)) {
+                            Invincible.isInvincible(e)) {
                         return false;
                     }
                     Vec3 vectorFromOriginToEntity = e.position().subtract(origin);

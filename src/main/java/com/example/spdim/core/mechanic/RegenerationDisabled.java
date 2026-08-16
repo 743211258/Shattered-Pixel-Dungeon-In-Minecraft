@@ -1,48 +1,33 @@
 package com.example.spdim.core.mechanic;
 
+import com.example.spdim.core.registry.ModEffects;
+import net.minecraft.world.entity.ai.attributes.AttributeMap;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-public class RegenerationDisabled {
-    // Hashmap to store all player with the effect active.
-    private static Map<LivingEntity, Integer> active = new HashMap<>();
-    // Put the target to the hashmap.
-    public static void disable(LivingEntity target, int ticks) {
-        if (target == null || ticks < 0) {
-            return;
-        }
-        if (active.containsKey(target)) {
-            int oldTick =  active.get(target);
-            active.put(target, oldTick + ticks);
-        } else {
-            active.put(target, ticks);
-        }
-    }
+public class RegenerationDisabled extends MobEffect {
 
-    public static void tick() {
-        Iterator<Map.Entry<LivingEntity, Integer>> iterator = active.entrySet().iterator();
+  public RegenerationDisabled() {
+    super(MobEffectCategory.HARMFUL, 0); 
+  }
 
-        while (iterator.hasNext()) {
-            Map.Entry<LivingEntity, Integer> entry = iterator.next();
-            LivingEntity entity = entry.getKey();
-            int ticks = entry.getValue();
-            // Conditions to check for removal of hashmap.
-            if (entity == null || !entity.isAlive() || entity.isRemoved() || ticks <= 0) {
-                iterator.remove();
-                continue;
-            }
-            // Decrease the tick time one for each tick.
-            entry.setValue(ticks - 1);
-        }
-    }
+  public void applyEffectTick(LivingEntity livingEntity, int amplifier) {
+    // No implementation
+  }
 
-    public static boolean isDisabled(LivingEntity entity) {
-        return active.containsKey(entity);
-    }
+  @Override
+  public boolean isDurationEffectTick(int duration, int amplifier) {
+    return true;
+  }
+  
+  @Override
+  public void removeAttributeModifiers(LivingEntity livingEntity, AttributeMap attributes, int amplifier) {
+    // No implementation
+  }
 
-    public static void disableRemove(LivingEntity target) {
-        active.remove(target);
-    }
+  public static boolean isDisabled(LivingEntity entity) {
+    return entity.hasEffect(ModEffects.REGEN_DISABLED.get());
+  }
 }
+

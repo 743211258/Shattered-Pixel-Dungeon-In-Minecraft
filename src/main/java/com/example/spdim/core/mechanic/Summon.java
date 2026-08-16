@@ -1,6 +1,6 @@
 package com.example.spdim.core.mechanic;
 
-import com.example.spdim.core.mechanic.RegenerationDisabled;
+import com.example.spdim.core.registry.ModEffects;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -12,11 +12,14 @@ import java.util.Objects;
 import net.minecraft.nbt.CompoundTag;
 
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+
+
 
 public final class Summon {
 
@@ -62,11 +65,11 @@ public final class Summon {
 			if ((summoner.getOffhandItem().isEmpty()) || (tag == null) || (!(tag.contains("SummonedUUID"))) || (!tag.getUUID("SummonedUUID").equals(summoned.getUUID()))) {
 				summoned.hurt(summoned.damageSources().fellOutOfWorld(), 0.5f);
 				if(summoned instanceof LivingEntity livingEntity) {
-					RegenerationDisabled.disable(livingEntity, 2100000);
+					livingEntity.addEffect(new MobEffectInstance(ModEffects.REGEN_DISABLED.get(), 2100000));
 				}
 			} else {
 				if (summoned instanceof LivingEntity livingEntity) {
-					RegenerationDisabled.disableRemove(livingEntity);
+					livingEntity.removeEffect(ModEffects.REGEN_DISABLED.get());
 				}
       }
 		}

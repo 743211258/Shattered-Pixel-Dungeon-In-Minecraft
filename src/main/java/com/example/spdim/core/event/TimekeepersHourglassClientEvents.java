@@ -1,7 +1,7 @@
 package com.example.spdim.core.event;
 
 import com.example.spdim.core.artifact.TimekeepersHourglass;
-import com.example.spdim.core.mechanic.TickFreeze;
+import com.example.spdim.core.mechanic.Freeze;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
@@ -49,7 +49,7 @@ public class TimekeepersHourglassClientEvents {
         if (keyFreezeOthers.consumeClick()) {
             ItemStack stack = player.getOffhandItem();
             // Call the function only when the player's offhand is holding timekeeper's hourglass and the player is not frozen.
-            if (stack.getItem() instanceof TimekeepersHourglass item && !TickFreeze.isFrozen(player)) {
+            if (stack.getItem() instanceof TimekeepersHourglass item && !Freeze.isFrozen(player)) {
                 item.FreezeOthersClient(player.level(), player, stack);
             }
         }
@@ -57,7 +57,7 @@ public class TimekeepersHourglassClientEvents {
         if (keyFreezeSelf.consumeClick()) {
             ItemStack stack = player.getOffhandItem();
             // Call the function only when the player's offhand is holding timekeeper's hourglass and the player is not frozen.
-            if (stack.getItem() instanceof TimekeepersHourglass item && !TickFreeze.isFrozen(player)) {
+            if (stack.getItem() instanceof TimekeepersHourglass item && !Freeze.isFrozen(player)) {
                 item.FreezeMyselfClient(player.level(), player, stack);
             }
         }

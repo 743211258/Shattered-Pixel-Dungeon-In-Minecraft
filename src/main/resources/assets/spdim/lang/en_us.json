@@ -1,16 +1,19 @@
 {
-  "death.attack.viscosity": "%1$s died from viscosity damage",
+	"death.attack.viscosity": "%1$s died from viscosity damage",
 	
-  "enchantment.spdim.viscosity": "Viscosity",
+	"enchantment.spdim.viscosity": "Viscosity",
 
+	"effect.spdim.freeze": "Time Freeze",
+	"effect.spdim.invincible": "Invincible",
+	"effect.spdim.regen_disabled": "No Healing",	
 	"effect.spdim.viscosity": "Damage Over Time",
 
-  "item.spdim.wand_of_blast_wave": "Wand of Blast Wave",
-  "item.spdim.wand_of_lightning": "Wand of Lightning",
-  "item.spdim.wand_of_fireblast": "Wand of Fireblast",
-  "item.spdim.timekeepers_hourglass": "Timekeeper's Hourglass",
-  "item.spdim.chalice_of_blood": "Chalice of Blood",
-  "item.spdim.wand_of_regrowth": "Wand of Regrowth",
-  "item.spdim.dried_rose": "Dried Rose",
-  "item.spdim.master_thieves_armband": "Master Thieve's Armband"
+	"item.spdim.wand_of_blast_wave": "Wand of Blast Wave",
+	"item.spdim.wand_of_lightning": "Wand of Lightning",
+	"item.spdim.wand_of_fireblast": "Wand of Fireblast",
+	"item.spdim.timekeepers_hourglass": "Timekeeper's Hourglass",
+	"item.spdim.chalice_of_blood": "Chalice of Blood",
+	"item.spdim.wand_of_regrowth": "Wand of Regrowth",
+	"item.spdim.dried_rose": "Dried Rose",
+	"item.spdim.master_thieves_armband": "Master Thieve's Armband"
 }

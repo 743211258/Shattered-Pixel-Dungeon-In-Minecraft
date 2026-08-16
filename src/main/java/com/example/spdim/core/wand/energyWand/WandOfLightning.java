@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.example.spdim.core.mechanic.Untargetable;
+import com.example.spdim.core.mechanic.Invincible;
 import com.example.spdim.core.wand.EnergyWand;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -65,7 +65,7 @@ public class WandOfLightning extends EnergyWand{
                 start,
                 end,
                 player.getBoundingBox().expandTowards(look.scale(range)).inflate(1.0),
-                e -> e instanceof LivingEntity living && e != player && !Untargetable.isUntargetable(living)
+                e -> e instanceof LivingEntity living && e != player && !Invincible.isInvincible(living)
         );
 
         // Calculate the coordinate of first collision
@@ -128,7 +128,7 @@ public class WandOfLightning extends EnergyWand{
         List<LivingEntity> entities = world.getEntitiesOfClass(LivingEntity.class,
                 new AABB(center.x - radius, center.y - radius, center.z - radius,
                         center.x + radius, center.y + radius, center.z + radius),
-                e -> e != player && !hitEntities.contains(e) && !Untargetable.isUntargetable(e) && e.position().distanceToSqr(center) <= radiusSqr);
+                e -> e != player && !hitEntities.contains(e) && !Invincible.isInvincible(e) && e.position().distanceToSqr(center) <= radiusSqr);
 
         for (LivingEntity e : entities) {
             // Add entities to the hashmap

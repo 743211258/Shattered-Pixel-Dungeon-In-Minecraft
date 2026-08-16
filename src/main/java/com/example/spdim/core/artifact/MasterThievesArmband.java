@@ -16,7 +16,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 
 import com.example.spdim.core.Artifact;
-import com.example.spdim.core.mechanic.Untargetable;
+import com.example.spdim.core.mechanic.Invincible;
 import com.example.spdim.core.network.MyModNetwork;
 import com.example.spdim.core.network.StealPacket;
 
@@ -83,7 +83,7 @@ public class MasterThievesArmband extends Artifact {
 			start,
 			end,
 			player.getBoundingBox().expandTowards(look.scale(MAX_CONTROL_RANGE)).inflate(1.0),
-			e -> e != player && e instanceof LivingEntity livingEntity && !Untargetable.isUntargetable(livingEntity)
+			e -> e != player && e instanceof LivingEntity livingEntity && !Invincible.isInvincible(livingEntity)
 		);
 		if (hitResult != null && hitResult.getEntity() instanceof LivingEntity livingEntity) {
 			for (EquipmentSlot slot : DISARM_SLOTS) {

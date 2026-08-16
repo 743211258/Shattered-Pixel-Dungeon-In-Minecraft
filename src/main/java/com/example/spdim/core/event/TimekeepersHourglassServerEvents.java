@@ -1,6 +1,6 @@
 package com.example.spdim.core.event;
 
-import com.example.spdim.core.mechanic.Untargetable;
+import com.example.spdim.core.mechanic.Invincible;
 import com.mojang.logging.LogUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
@@ -21,7 +21,7 @@ public class TimekeepersHourglassServerEvents {
     @SubscribeEvent
     public static void onLivingBeenAttacked(LivingHurtEvent event) {
         // Diable any damage if the target is untargetable.
-        if (Untargetable.isUntargetable(event.getEntity())) {
+        if (Invincible.isInvincible(event.getEntity())) {
             event.setCanceled(true);
         }
     }
@@ -35,7 +35,7 @@ public class TimekeepersHourglassServerEvents {
         // Get the player.
         Player player = event.player;
         // Nothing need to be done if the player is not untargetable.
-        if (!(player.level() instanceof ServerLevel) || !Untargetable.isUntargetable(player)) {
+        if (!(player.level() instanceof ServerLevel) || !Invincible.isInvincible(player)) {
             return;
         }
         //
@@ -46,7 +46,7 @@ public class TimekeepersHourglassServerEvents {
         // Remove mobs' attack intentions if they are within the radius
         // No need to check for inscribed sphere since most mobs has an attacking radius less than 32
         for (Mob mob : mobsNearby) {
-            if (mob.getTarget() instanceof Player target && Untargetable.isUntargetable(target)) {
+            if (mob.getTarget() instanceof Player target && Invincible.isInvincible(target)) {
                 mob.setTarget(null);
             }
         }
@@ -56,7 +56,7 @@ public class TimekeepersHourglassServerEvents {
         LivingEntity newTarget = event.getNewTarget();
 
         // Prevent mobs from choosing untargetable players.
-        if (newTarget instanceof Player player && Untargetable.isUntargetable(player)) {
+        if (newTarget instanceof Player player && Invincible.isInvincible(player)) {
             event.setNewTarget(null);
         }
     }

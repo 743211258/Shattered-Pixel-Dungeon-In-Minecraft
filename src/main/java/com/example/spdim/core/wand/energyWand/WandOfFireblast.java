@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.example.spdim.core.mechanic.Untargetable;
+import com.example.spdim.core.mechanic.Invincible;
 import com.example.spdim.core.wand.EnergyWand;
 import com.example.spdim.ExampleMod;
 
@@ -83,7 +83,7 @@ public class WandOfFireblast extends EnergyWand {
                 box,
                 e -> {
                     if (e == player ||
-                            Untargetable.isUntargetable(e)) {
+                            Invincible.isInvincible(e)) {
                         return false;
                     }
                     Vec3 vectorFromOriginToEntity = e.position().subtract(origin);

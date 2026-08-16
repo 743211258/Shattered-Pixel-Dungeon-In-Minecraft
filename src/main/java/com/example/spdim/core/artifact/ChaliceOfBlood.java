@@ -2,10 +2,10 @@ package com.example.spdim.core.artifact;
 
 import com.example.spdim.ExampleMod;
 import com.example.spdim.core.Artifact;
-import com.example.spdim.core.mechanic.RegenerationDisabled;
-import com.example.spdim.core.mechanic.TickFreeze;
+import com.example.spdim.core.registry.ModEffects;
 import com.example.spdim.core.network.ChaliceOfBloodOnUsePacket;
 import com.example.spdim.core.network.MyModNetwork;
+
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -63,6 +63,8 @@ public class ChaliceOfBlood extends Artifact {
         MobEffectInstance nightVision = new MobEffectInstance(MobEffects.NIGHT_VISION, EFFECT_DURATION, 0, false, true);
         MobEffectInstance absorption = new MobEffectInstance(MobEffects.ABSORPTION, EFFECT_DURATION, 3, false, true);
         MobEffectInstance resistance = new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, EFFECT_DURATION, 3, false, true);
+        MobEffectInstance freeze = new MobEffectInstance(ModEffects.FREEZE.get(), 200);
+        MobEffectInstance regenDisabled = new MobEffectInstance(ModEffects.REGEN_DISABLED.get(), 6000);
         player.addEffect(swiftness);
         player.addEffect(strength);
         player.addEffect(jump);
@@ -70,8 +72,8 @@ public class ChaliceOfBlood extends Artifact {
         player.addEffect(absorption);
         player.addEffect(resistance);
         // Freeze the player for 10 seconds.
-        TickFreeze.freeze(player, 200);
+        player.addEffect(freeze);
         // Disable regeneration for 5 minutes.
-        RegenerationDisabled.disable(player, 6000);
+        player.addEffect(regenDisabled);
     }
 }

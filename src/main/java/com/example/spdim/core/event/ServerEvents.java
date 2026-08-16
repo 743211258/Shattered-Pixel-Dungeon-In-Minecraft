@@ -1,9 +1,6 @@
 package com.example.spdim.core.event;
 
-import com.example.spdim.core.mechanic.RegenerationDisabled;
 import com.example.spdim.core.mechanic.Rooted;
-import com.example.spdim.core.mechanic.TickFreeze;
-import com.example.spdim.core.mechanic.Untargetable;
 import com.example.spdim.core.mechanic.TargetLock;
 import com.example.spdim.core.mechanic.Summon;
 import com.example.spdim.core.mechanic.Taunt;
@@ -35,9 +32,6 @@ public class ServerEvents {
         if (event.phase != TickEvent.Phase.END) {
             return;
         }
-        TickFreeze.tick();
-        Untargetable.tick();
-        RegenerationDisabled.tick();
         Rooted.tick();
 				TargetLock.tick();
 				Summon.tick();

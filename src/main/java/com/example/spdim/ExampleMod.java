@@ -41,7 +41,7 @@ import com.example.spdim.core.projectile.BlastWave;
 import com.example.spdim.core.wand.energyWand.WandOfBlastWave;
 import com.example.spdim.core.wand.energyWand.WandOfLightning;
 import com.example.spdim.core.enchantment.Viscosity;
-import com.example.spdim.core.mechanic.ViscosityEffect;
+import com.example.spdim.core.registry.ModEffects;
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(ExampleMod.MODID)
 public class ExampleMod
@@ -63,7 +63,6 @@ public class ExampleMod
     // Create a Deferred Register to hold Items which will all be registered under the "examplemod" namespace
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
     public static final DeferredRegister<Enchantment> ENCHANTMENTS = DeferredRegister.create(ForgeRegistries.ENCHANTMENTS, MODID);
-    public static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, MODID);
 
 		// Create a Deferred Register to hold CreativeModeTabs which will all be registered under the "examplemod" namespace
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
@@ -79,7 +78,6 @@ public class ExampleMod
     public static final RegistryObject<Item> MASTER_THIEVES_ARMBAND = ITEMS.register("master_thieves_armband", () -> new MasterThievesArmband(new Item.Properties().stacksTo(1)));
 
 		public static final RegistryObject<Enchantment> VISCOSITY = ENCHANTMENTS.register("viscosity", () -> new Viscosity());
-		public static final RegistryObject<MobEffect> VISCOSITY_EFFECT = EFFECTS.register("viscosity", () -> new ViscosityEffect());
     // Creates a new food item with the id "examplemod:example_id", nutrition 1 and saturation 2
     public static final RegistryObject<Item> EXAMPLE_ITEM = ITEMS.register("example_item", () -> new Item(new Item.Properties().food(new FoodProperties.Builder()
             .alwaysEat().nutrition(1).saturationMod(2f).build())));
@@ -114,7 +112,7 @@ public class ExampleMod
         ITEMS.register(modEventBus);
         // Register the Deferred Register to the mod event bus so tabs get registered
         ENCHANTMENTS.register(modEventBus); 
-				EFFECTS.register(modEventBus);
+				ModEffects.EFFECTS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
         ENTITY_TYPE.register(modEventBus);
 

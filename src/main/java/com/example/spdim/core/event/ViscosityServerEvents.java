@@ -22,6 +22,7 @@ import com.example.spdim.core.mechanic.MixinReference;
 import com.example.spdim.core.enchantment.Viscosity;
 import com.example.spdim.core.mechanic.ViscosityEffect;
 import com.example.spdim.core.registry.ModDamageSources;
+import com.example.spdim.core.registry.ModEffects;
 import com.example.spdim.ExampleMod;
 
 @Mod.EventBusSubscriber(modid = "spdim", bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -73,7 +74,7 @@ public class ViscosityServerEvents {
 		float totalDamage = tag.getFloat("totalDamage");
 		totalDamage += viscosityDamage;
 		tag.putFloat("totalDamage", totalDamage);
-		MobEffectInstance oldEffect = livingEntity.getEffect(ExampleMod.VISCOSITY_EFFECT.get());
+		MobEffectInstance oldEffect = livingEntity.getEffect(ModEffects.VISCOSITY_EFFECT.get());
 		float nextDamage = totalDamage / 10.0F;
 		if (nextDamage < 1.0F) {
 			if (totalDamage >= 1.0F) {
@@ -82,7 +83,7 @@ public class ViscosityServerEvents {
 				nextDamage = totalDamage;
 			}
 		}
-		livingEntity.addEffect(new MobEffectInstance(ExampleMod.VISCOSITY_EFFECT.get(), MobEffectInstance.INFINITE_DURATION, Mth.ceil(nextDamage) - 1));
+		livingEntity.addEffect(new MobEffectInstance(ModEffects.VISCOSITY_EFFECT.get(), MobEffectInstance.INFINITE_DURATION, Mth.ceil(nextDamage) - 1));
 		float health = livingEntity.getHealth();
 		float maxHealth = livingEntity.getMaxHealth();
 		float remainingDamage = damageToLivingEntity - absorption;

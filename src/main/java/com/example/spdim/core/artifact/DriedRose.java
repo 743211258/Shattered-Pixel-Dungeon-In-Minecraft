@@ -1,7 +1,7 @@
 package com.example.spdim.core.artifact;
 
 import com.example.spdim.core.mechanic.Summon;
-import com.example.spdim.core.mechanic.Untargetable;
+import com.example.spdim.core.mechanic.Invincible;
 import com.example.spdim.core.mechanic.TargetLock;
 import com.example.spdim.core.mechanic.Taunt;
 import com.example.spdim.core.Artifact;
@@ -253,7 +253,7 @@ public class DriedRose extends Artifact {
 			start,
   		end,
 			box,
-			e -> e != entity && e instanceof LivingEntity livingEntity && !Untargetable.isUntargetable(livingEntity) && livingEntity != player && livingEntity.isAlive()
+			e -> e != entity && e instanceof LivingEntity livingEntity && !Invincible.isInvincible(livingEntity) && livingEntity != player && livingEntity.isAlive()
 		);
 		if (hitResult != null && hitResult.getEntity() instanceof LivingEntity livingEntity) {	
 			if (entity instanceof Wolf wolf) {

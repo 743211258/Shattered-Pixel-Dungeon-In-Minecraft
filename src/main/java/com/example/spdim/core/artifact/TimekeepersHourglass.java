@@ -1,9 +1,8 @@
 package com.example.spdim.core.artifact;
 
 import com.example.spdim.core.Artifact;
-
-import com.example.spdim.core.mechanic.TickFreeze;
-import com.example.spdim.core.mechanic.Untargetable;
+import com.example.spdim.core.registry.ModEffects;
+import com.example.spdim.core.mechanic.Invincible;
 import com.example.spdim.core.network.FreezeOthersPacket;
 import com.example.spdim.core.network.FreezeSelfPacket;
 import com.example.spdim.core.network.MyModNetwork;
@@ -78,8 +77,8 @@ public class TimekeepersHourglass extends Artifact {
                 player.getBoundingBox().expandTowards(look.scale(range)).inflate(1.0),
                 e -> e instanceof LivingEntity && e != player
         );
-        if (entityHit != null && entityHit.getEntity() instanceof LivingEntity target && !Untargetable.isUntargetable(target)) {
-            TickFreeze.freeze(target, 100);
+        if (entityHit != null && entityHit.getEntity() instanceof LivingEntity target && !Invincible.isInvincible(target)) {
+            target.addEffect(new MobEffectInstance(ModEffects.FREEZE.get(), 100));
         } else {
             return;
         }
@@ -106,7 +105,7 @@ public class TimekeepersHourglass extends Artifact {
         }
 
         tag.putLong("LastChargeTime", player.level().getGameTime());
-        player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 200, 0, false, false));
-        Untargetable.activate(player, 200);
+        player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 200, 0, false, false)); 
+        player.addEffect(new MobEffectInstance(ModEffects.INVINCIBLE.get(), 200));
     }
 }

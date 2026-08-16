@@ -4,7 +4,7 @@ import com.example.spdim.core.Artifact;
 import com.example.spdim.core.artifact.DriedRose;
 import com.example.spdim.core.data_structure.IntVec2;
 import com.example.spdim.core.mechanic.Rooted;
-import com.example.spdim.core.mechanic.TickFreeze;
+import com.example.spdim.core.mechanic.Freeze;
 import com.example.spdim.core.mechanic.Taunt;
 import com.example.spdim.core.wand.EnergyWand;
 
@@ -184,7 +184,7 @@ public class ClientEvents {
     public static void onMovementInput(MovementInputUpdateEvent event) {
         Player player = event.getEntity();
 
-        if (TickFreeze.isFrozen(player) || Rooted.isRooted(player)) {
+        if (Freeze.isFrozen(player) || Rooted.isRooted(player)) {
             var input = event.getInput();
 
             // Disable all movement keys.
@@ -199,7 +199,7 @@ public class ClientEvents {
     public static void onInteractionKeyMapping(InputEvent.InteractionKeyMappingTriggered event) {
         Player player = Minecraft.getInstance().player;
         // Disable interaction keys.
-        if (player != null && TickFreeze.isFrozen(player)) {
+        if (player != null && Freeze.isFrozen(player)) {
             event.setCanceled(true);
         }
     }

@@ -12,11 +12,11 @@ import com.example.spdim.core.data_structure.ViscosityTotalDamageRender;
 import com.example.spdim.core.mechanic.MixinReference;
 import com.example.spdim.core.enchantment.Viscosity;
 import com.example.spdim.core.registry.ModDamageSources;
-import com.example.spdim.ExampleMod;
+import com.example.spdim.core.registry.ModEffects;
 
 public class ViscosityEffect extends MobEffect {
 	public ViscosityEffect() {
-		super(MobEffectCategory.HARMFUL, 0x9D00FF);
+		super(MobEffectCategory.BENEFICIAL, 0x9D00FF);
 	}
 
 	@Override
@@ -62,7 +62,7 @@ public class ViscosityEffect extends MobEffect {
 			}
 		}
 		if (nextDamage == 0.0F) {
-			entity.removeEffect(ExampleMod.VISCOSITY_EFFECT.get());
+			entity.removeEffect(ModEffects.VISCOSITY_EFFECT.get());
 			MixinReference.renderReference.remove(entity.getUUID());
 			data.remove("totalDamage");
 			data.remove("ViscosityTick");
