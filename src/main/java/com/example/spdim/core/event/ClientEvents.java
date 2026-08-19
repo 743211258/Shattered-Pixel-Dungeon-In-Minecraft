@@ -2,8 +2,10 @@ package com.example.spdim.core.event;
 
 import com.example.spdim.core.Artifact;
 import com.example.spdim.core.artifact.DriedRose;
+import com.example.spdim.core.data_structure.CooldownState;
 import com.example.spdim.core.data_structure.IntVec2;
 import com.example.spdim.core.mechanic.Rooted;
+import com.example.spdim.core.mechanic.CooldownSystem;
 import com.example.spdim.core.mechanic.Freeze;
 import com.example.spdim.core.mechanic.Taunt;
 import com.example.spdim.core.wand.EnergyWand;
@@ -68,14 +70,12 @@ public class ClientEvents {
             if (stack.getItem() instanceof EnergyWand) {
                 pos.setX(x + 6);
                 pos.setY(y + 11);
-
-                CompoundTag tag = stack.getTag();
-                if (tag == null || tag.isEmpty()) {
+                CooldownState state = CooldownSystem.readCooldownState(stack); 
+                if (state == null) {
                     continue;
                 }
-
-                int currentEnergy = tag.getInt("CurrentEnergy");
-                int maxEnergy = tag.getInt("CurrentMaxEnergy");
+                int currentEnergy = state.currentEnergy;
+                int maxEnergy = state.maxEnergy; 
                 String text = currentEnergy + "/" + maxEnergy;
                 wandInventoryRenderCache.put(pos, text);
             } else if (stack.getItem() instanceof Artifact artifact) {
@@ -126,14 +126,12 @@ public class ClientEvents {
             if (stack.getItem() instanceof EnergyWand) {
                 pos.setX(x + 6);
                 pos.setY(y + 11);
-
-                CompoundTag tag = stack.getTag();
-                if (tag == null || tag.isEmpty()) {
+                CooldownState state = CooldownSystem.readCooldownState(stack); 
+                if (state == null) {
                     continue;
                 }
-
-                int currentEnergy = tag.getInt("CurrentEnergy");
-                int maxEnergy = tag.getInt("CurrentMaxEnergy");
+                int currentEnergy = state.currentEnergy;
+                int maxEnergy = state.maxEnergy; 
                 String text = currentEnergy + "/" + maxEnergy;
                 wandHotBarRenderCache.put(pos, text);
             } else if (stack.getItem() instanceof Artifact artifact) {

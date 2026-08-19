@@ -65,7 +65,7 @@ public class Freeze extends MobEffect {
 
 		} else if (livingEntity instanceof ServerPlayer serverPlayer) {
 			if (!LIVING_ENTITY_POSITION.containsKey(serverPlayer)) {
-			PosAndDirection pd = new PosAndDirection();
+				PosAndDirection pd = new PosAndDirection();
 				pd.pos = serverPlayer.position();
 				pd.yRot = serverPlayer.getYRot();
 				pd.xRot = serverPlayer.getXRot();

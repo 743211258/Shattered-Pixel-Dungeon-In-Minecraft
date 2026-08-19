@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.example.spdim.core.mechanic.Invincible;
+import com.example.spdim.core.mechanic.CooldownSystem;
 import com.example.spdim.core.wand.EnergyWand;
 import com.example.spdim.ExampleMod;
 
@@ -48,7 +49,7 @@ public class WandOfFireblast extends EnergyWand {
         }
 
         // Cast only when the wand is charged.
-        if (getCurrentEnergy(stack) <= 0) {
+        if (!CooldownSystem.hasPositiveEnergy(stack)) {
             return;
         }
 
@@ -149,12 +150,7 @@ public class WandOfFireblast extends EnergyWand {
                 }
             }
         }
-        if (getCurrentEnergy(stack) == getCurrentMaxEnergy(stack)) {
-            stack.getOrCreateTag();
-            CompoundTag tag = stack.getOrCreateTag();
-            tag.putLong("LastChargeTime", player.level().getGameTime());
-        }
-        setCurrentEnergy(stack, getCurrentEnergy(stack) - 1);
+        CooldownSystem.consumeAnyEnergy(stack, 1, world);
     }
 
     private void tryIgniteSurface(Level world, BlockPos pos) {

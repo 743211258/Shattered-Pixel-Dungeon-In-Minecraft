@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Set;
 
 import com.example.spdim.core.mechanic.Invincible;
+import com.example.spdim.core.mechanic.CooldownSystem;
 import com.example.spdim.core.wand.EnergyWand;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -40,9 +42,10 @@ public class WandOfLightning extends EnergyWand{
             return;
         }
 
-        if (getCurrentEnergy(stack) <= 0) {
+        if (!CooldownSystem.hasPositiveEnergy(stack)) {
             return;
         }
+
 
         Vec3 start = player.getEyePosition(1.0F);
         Vec3 look = player.getLookAngle();
@@ -110,12 +113,7 @@ public class WandOfLightning extends EnergyWand{
 
         // Recursive find entities within the radius and spawn lightnings on them.
         spawnChainLightning(world, hitPos, player, 5.0, 3, hitEntities);
-        if (getCurrentEnergy(stack) == getCurrentMaxEnergy(stack)) {
-            stack.getOrCreateTag();
-            CompoundTag tag = stack.getOrCreateTag();
-            tag.putLong("LastChargeTime", player.level().getGameTime());
-        }
-        setCurrentEnergy(stack, getCurrentEnergy(stack) - 1);
+        CooldownSystem.consumeAnyEnergy(stack, 1, world);
     }
 
     private void spawnChainLightning(Level world, Vec3 center, Player player, double radius, int maxDepth, Set<LivingEntity> hitEntities) {

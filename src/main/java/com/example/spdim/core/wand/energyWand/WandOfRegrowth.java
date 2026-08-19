@@ -3,7 +3,9 @@ package com.example.spdim.core.wand.energyWand;
 import com.example.spdim.ExampleMod;
 import com.example.spdim.core.mechanic.Rooted;
 import com.example.spdim.core.mechanic.Invincible;
+import com.example.spdim.core.mechanic.CooldownSystem;
 import com.example.spdim.core.wand.EnergyWand;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -37,8 +39,12 @@ public class WandOfRegrowth extends EnergyWand {
 
     @Override
     protected void cast(Level world, Player player, ItemStack stack) {
-        if (world.isClientSide) return;
-        if (getCurrentEnergy(stack) <= 0) return;
+        if (world.isClientSide) {
+            return;
+        }
+        if (!CooldownSystem.hasPositiveEnergy(stack)) {
+            return;
+        }
         Vec3 origin = player.getEyePosition(1.0F);
 
         // Build a Lookat matrix
@@ -132,12 +138,7 @@ public class WandOfRegrowth extends EnergyWand {
                 }
             }
         }
-        if (getCurrentEnergy(stack) == getCurrentMaxEnergy(stack)) {
-            stack.getOrCreateTag();
-            CompoundTag tag = stack.getOrCreateTag();
-            tag.putLong("LastChargeTime", player.level().getGameTime());
-        }
-        setCurrentEnergy(stack, getCurrentEnergy(stack) - 1);
+        CooldownSystem.consumeAnyEnergy(stack, 1, world);
     }
 
     private void spawnBlockParticles(Level world, Vec3 pos) {

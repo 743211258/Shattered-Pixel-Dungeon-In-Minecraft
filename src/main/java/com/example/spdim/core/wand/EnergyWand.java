@@ -11,8 +11,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
+import com.example.spdim.core.interfaces.EnergyBased;
+import com.example.spdim.core.mechanic.CooldownSystem;
 // Energy wand class
-public abstract class EnergyWand extends Wand {
+public abstract class EnergyWand extends Wand implements EnergyBased{
     protected final int maxEnergy;
     protected final int energyCost;
     protected final int maxCooldown;
@@ -27,39 +29,22 @@ public abstract class EnergyWand extends Wand {
         this.name = name;
     }
 
+    @Override
+    public double getEnergyRestorationPerTick() {
+        return 1;
+    }
+
+    @Override
+    public int getConsumptionAmount() {
+        return 1;
+    }
+
+    @Override
+    public int getRestorationAmount() {
+        return 1;
+    }
+
     // Data are based on NBT (except name) instead of class variables
-    public int getCurrentEnergy(ItemStack stack) {
-        return stack.getOrCreateTag().getInt("CurrentEnergy");
-    }
-
-    public void setCurrentEnergy(ItemStack stack, int value) {
-        stack.getOrCreateTag().putInt("CurrentEnergy", value);
-    }
-
-    public int getCurrentMaxEnergy(ItemStack stack) {
-        return stack.getOrCreateTag().getInt("CurrentMaxEnergy");
-    }
-
-    public void setCurrentMaxEnergy(ItemStack stack, int value) {
-        stack.getOrCreateTag().putInt("CurrentMaxEnergy", value);
-    }
-
-    public int getEnergyCost(ItemStack stack) {
-        return stack.getOrCreateTag().getInt("EnergyCost");
-    }
-
-    public void setEnergyCost(ItemStack stack, int value) {
-        stack.getOrCreateTag().putInt("EnergyCost", value);
-    }
-
-    public int getMaxCooldown(ItemStack stack) {
-        return stack.getOrCreateTag().getInt("MaxCooldown");
-    }
-
-    public void setMaxCooldown(ItemStack stack, int value) {
-        stack.getOrCreateTag().putInt("MaxCooldown", value);
-    }
-
     public Component getName(ItemStack stack) {
         return name;
     }
@@ -72,35 +57,12 @@ public abstract class EnergyWand extends Wand {
     @Override
     public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, world, entity, slot, selected);
-
         if (world.isClientSide) {
             return;
         }
-
-        if (!stack.hasTag()) {
-            initializeNBT(stack, world);
-        }
-
-        CompoundTag tag = stack.getOrCreateTag();
-        long lastTime = tag.getLong("LastChargeTime");
         long now = world.getGameTime();
-
-        if (getCurrentEnergy(stack) < getCurrentMaxEnergy(stack)) {
-            if (now - lastTime >= maxCooldown) {
-                setCurrentEnergy(stack, getCurrentEnergy(stack) + 1);
-                tag.putLong("LastChargeTime", now);
-            }
-        }
-    }
-
-    // Initialize NBT
-    protected void initializeNBT(ItemStack stack, Level world) {
-        CompoundTag tag = stack.getOrCreateTag();
-        tag.putInt("CurrentEnergy", maxEnergy);
-        tag.putInt("CurrentMaxEnergy", maxEnergy);
-        tag.putInt("EnergyCost", energyCost);
-        tag.putInt("MaxCooldown", maxCooldown);
-        tag.putLong("LastChargeTime", world.getGameTime());
+        CooldownSystem.createCooldownState(stack, maxEnergy, maxEnergy, maxCooldown, now);
+        CooldownSystem.tryRegainAnyEnergy(stack, 1, world);
     }
 
     protected abstract void cast(Level world, Player player, ItemStack stack);

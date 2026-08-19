@@ -1,6 +1,7 @@
 package com.example.spdim.core.wand.energyWand;
 
 import com.example.spdim.core.wand.EnergyWand;
+import com.example.spdim.core.mechanic.CooldownSystem;
 import com.example.spdim.core.projectile.BlastWave;
 import net.minecraft.nbt.CompoundTag;
 
@@ -25,7 +26,7 @@ public class WandOfBlastWave extends EnergyWand{
     protected void cast(Level world, Player player, ItemStack stack) {
         if (!world.isClientSide) {
             // Cast happens only if the wand is charged
-            if (getCurrentEnergy(stack) > 0) {
+            if (CooldownSystem.hasPositiveEnergy(stack)) {
                 // Generate a blast wave entity at eye level
                 BlastWave wave = new BlastWave(ExampleMod.BLAST_WAVE.get(), world);
 
@@ -45,11 +46,7 @@ public class WandOfBlastWave extends EnergyWand{
                 world.addFreshEntity(wave);
 
                 // Additional condition to prevent bugs.
-                if (getCurrentEnergy(stack) == getCurrentMaxEnergy(stack)) {
-                    CompoundTag tag = stack.getOrCreateTag();
-                    tag.putLong("LastChargeTime", player.level().getGameTime());
-                }
-                setCurrentEnergy(stack, getCurrentEnergy(stack) - 1);
+                CooldownSystem.consumeAnyEnergy(stack, 1, world);
             }
         }
     }
