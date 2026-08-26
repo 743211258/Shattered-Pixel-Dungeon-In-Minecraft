@@ -48,6 +48,9 @@ public class ClientEvents {
     private static final Set<IntVec2> artifactHotBarRenderCache = new HashSet<>();
     private static final Map<IntVec2, Float> artifactHotBarRenderTauntCache = new HashMap<>();
     private static final Map<IntVec2, Boolean> artifactHotBarRenderIsOnCache = new HashMap<>();
+    private static final Map<IntVec2, Integer> HotBarItemCooldownCache = new HashMap<>(); 
+    private static final Map<IntVec2, Integer> InventoryItemCooldownCache = new HashMap<>(); 
+
 
     private static final int WIDTH = 16;
     private static final int HEIGHT = 16;
@@ -57,6 +60,8 @@ public class ClientEvents {
         artifactInventoryRenderCache.clear();
         artifactInventoryRenderTauntCache.clear();
         artifactInventoryRenderIsOnCache.clear();
+        InventoryItemCooldownCache.clear();
+
         for (Slot slot : screen.getMenu().slots) {
             if (!(slot.container == player.getInventory())) {
                 continue;
@@ -68,15 +73,20 @@ public class ClientEvents {
 
             IntVec2 pos = new IntVec2(x, y);
             if (stack.getItem() instanceof EnergyWand) {
-                pos.setX(x + 6);
-                pos.setY(y + 11);
                 CooldownState state = CooldownSystem.readCooldownState(stack); 
                 if (state == null) {
                     continue;
                 }
                 int currentEnergy = state.currentEnergy;
                 int maxEnergy = state.maxEnergy; 
+                int percentage = CooldownSystem.roundToNearestSixteen(stack, player.level());
+                if (currentEnergy != maxEnergy) {
+                    IntVec2 tempPos = new IntVec2(x, y);
+                    InventoryItemCooldownCache.put(tempPos, percentage);
+                }
                 String text = currentEnergy + "/" + maxEnergy;
+                pos.setX(x + 6);
+                pos.setY(y + 11);
                 wandInventoryRenderCache.put(pos, text);
             } else if (stack.getItem() instanceof Artifact artifact) {
                 if (artifact.isApplicable(stack, player.level())) {
@@ -104,6 +114,7 @@ public class ClientEvents {
         artifactHotBarRenderCache.clear();
         artifactHotBarRenderTauntCache.clear();
         artifactHotBarRenderIsOnCache.clear();
+        HotBarItemCooldownCache.clear();
 
         Minecraft mc = Minecraft.getInstance();
 
@@ -124,15 +135,20 @@ public class ClientEvents {
             IntVec2 pos = new IntVec2(x, y);
 
             if (stack.getItem() instanceof EnergyWand) {
-                pos.setX(x + 6);
-                pos.setY(y + 11);
                 CooldownState state = CooldownSystem.readCooldownState(stack); 
                 if (state == null) {
                     continue;
                 }
                 int currentEnergy = state.currentEnergy;
                 int maxEnergy = state.maxEnergy; 
+                int percentage = CooldownSystem.roundToNearestSixteen(stack, player.level());
+                if (currentEnergy != maxEnergy) {
+                    IntVec2 tempPos = new IntVec2(x, y);
+                    HotBarItemCooldownCache.put(tempPos, percentage);
+                }
                 String text = currentEnergy + "/" + maxEnergy;
+                pos.setX(x + 6);
+                pos.setY(y + 11);
                 wandHotBarRenderCache.put(pos, text);
             } else if (stack.getItem() instanceof Artifact artifact) {
                 if (artifact.isApplicable(stack, player.level())) {
@@ -175,6 +191,7 @@ public class ClientEvents {
             artifactInventoryRenderCache.clear();
             artifactInventoryRenderTauntCache.clear();
             artifactInventoryRenderIsOnCache.clear();
+            InventoryItemCooldownCache.clear();
         }
     }
 
@@ -218,6 +235,16 @@ public class ClientEvents {
             int x = entry.getX();
             int y = entry.getY();
             gui.fill(x, y, x + WIDTH, y + HEIGHT, 0x80FF0000);
+        }
+        for (Map.Entry<IntVec2, Integer> entry : InventoryItemCooldownCache.entrySet()) {
+            int x = entry.getKey().getX();
+            int y = entry.getKey().getY();
+            Integer integer_value = entry.getValue();
+            if (integer_value == null) {
+                continue;
+            }
+            int percentage = integer_value.intValue();
+            gui.fill(x, y + percentage, x + WIDTH, y + HEIGHT, 0x80FF0000);
         }
         for (Map.Entry<IntVec2, Float> entry : artifactInventoryRenderTauntCache.entrySet()) {
             gui.pose().pushPose();
@@ -269,11 +296,22 @@ public class ClientEvents {
             gui.drawString(font, entry.getValue(), entry.getKey().getX() / 0.5f, entry.getKey().getY() / 0.5f, 0xFFFFFF, true);
             gui.pose().popPose();
         }
+        for (Map.Entry<IntVec2, Integer> entry : HotBarItemCooldownCache.entrySet()) {
+            int x = entry.getKey().getX();
+            int y = entry.getKey().getY();
+            Integer integer_value = entry.getValue();
+            if (integer_value == null) {
+                continue;
+            }
+            int percentage = integer_value.intValue();
+            gui.fill(x, y + percentage, x + WIDTH, y + HEIGHT, 0x80FF0000);
+        }
+
         for (IntVec2 entry : artifactHotBarRenderCache) {
             int x = entry.getX();
             int y = entry.getY();
             gui.fill(x, y, x + WIDTH, y + HEIGHT, 0x80FF0000);
-        }        
+        }      
         for (Map.Entry<IntVec2, Float> entry : artifactHotBarRenderTauntCache.entrySet()) {
             gui.pose().pushPose();
             gui.pose().scale(0.35f, 0.35f, 1);

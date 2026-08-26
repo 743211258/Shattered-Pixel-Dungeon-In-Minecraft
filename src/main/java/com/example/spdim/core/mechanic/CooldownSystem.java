@@ -4,6 +4,7 @@ import com.example.spdim.core.data_structure.CooldownState;
 import com.example.spdim.core.interfaces.EnergyBased;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
@@ -128,4 +129,13 @@ public class CooldownSystem {
 		}
 		return (state.currentEnergy > 0);
 	}
+
+	public static int roundToNearestSixteen(ItemStack stack, Level level) {
+		CooldownState state = readCooldownState(stack);
+		if (state == null) {
+			return -1;
+		}
+		long TimePassed = level.getGameTime() - state.lastUseTime;
+		return Math.min(Mth.floor(16.0F * (float) TimePassed / (float) (state.cooldown)), 16);
+	} 
 }
