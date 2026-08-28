@@ -6,6 +6,7 @@ import com.example.spdim.core.mechanic.Summon;
 import com.example.spdim.core.mechanic.Taunt;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -32,10 +33,11 @@ public class ServerEvents {
         if (event.phase != TickEvent.Phase.END) {
             return;
         }
+        MinecraftServer server = event.getServer();
         Rooted.tick();
 				TargetLock.tick();
 				Summon.tick();
-        Taunt.tick();
+        Taunt.tick(server);
 				SyncViscosityPacket packet =
 								new SyncViscosityPacket(
 												MixinReference.renderReference,

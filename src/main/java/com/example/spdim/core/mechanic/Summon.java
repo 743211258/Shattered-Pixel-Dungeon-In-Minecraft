@@ -1,10 +1,13 @@
 package com.example.spdim.core.mechanic;
 
 import com.example.spdim.core.registry.ModEffects;
+import com.example.spdim.core.functions.Functions;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import java.util.function.Consumer;
 import java.util.Objects;
@@ -17,13 +20,14 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
-
 
 
 public final class Summon {
 
 	private static Map<Entity, Player> summonedEntity = new HashMap<>();
+	private static Map<Entity, ChunkPos> forceLoadChunksCenter = new HashMap<>();
 
 	private Summon() {};
 	
@@ -43,7 +47,14 @@ public final class Summon {
 			init.accept(entity);
 		}
 		level.addFreshEntity(entity);
+		ChunkPos chunkPos = entity.chunkPosition();
+		Set<ChunkPos> chunks = new HashSet<>();
+		Functions.addSurroundingChunks(chunkPos, chunks);
+		for (ChunkPos chunk : chunks) {
+			level.setChunkForced(chunk.x, chunk.z, true);
+		}
 		summonedEntity.put(entity, player);
+		forceLoadChunksCenter.put(entity, chunkPos);
 		CompoundTag tag = entity.getPersistentData();
 		tag.putUUID("Owner", player.getUUID());
 		return entity;
@@ -57,7 +68,7 @@ public final class Summon {
 			Player summoner = entry.getValue();
 			
 			if (summoned == null || !summoned.isAlive() || summoned.isRemoved()) {
-				System.out.println("Triggers\n");	
+				System.out.println("Triggers\n");
 				iterator.remove();
 				continue;
 			}
@@ -73,6 +84,47 @@ public final class Summon {
 				}
       }
 		}
-	}
+		Map<ServerLevel, Set<ChunkPos>> oldChunksByLevel = new HashMap<>();
+		Map<ServerLevel, Set<ChunkPos>> newChunksByLevel = new HashMap<>();
+		Iterator<Map.Entry<Entity, ChunkPos>> forceLoadChunksCenterIterator = forceLoadChunksCenter.entrySet().iterator();
+		while (forceLoadChunksCenterIterator.hasNext()) {
+			Map.Entry<Entity, ChunkPos> entry = forceLoadChunksCenterIterator.next();
+			Entity summoned = entry.getKey();
+			ChunkPos oldCenter = entry.getValue();
+			if (summoned == null || !summoned.isAlive() || summoned.isRemoved()) {
+				forceLoadChunksCenterIterator.remove();
+				continue;
+			}   			
+			if (!(summoned.level() instanceof ServerLevel level)) {
+				continue;
+			}
+			Functions.addSurroundingChunks(oldCenter, oldChunksByLevel.computeIfAbsent(level, k -> new HashSet<>()));
+			Functions.addSurroundingChunks(summoned.chunkPosition(), newChunksByLevel.computeIfAbsent(level, k -> new HashSet<>()));
+		}
 
+		for (ServerLevel level : oldChunksByLevel.keySet()) {
+			Set<ChunkPos> oldChunks = oldChunksByLevel.get(level);
+			Set<ChunkPos> newChunks = newChunksByLevel.getOrDefault(level, Set.of());
+
+			Set<ChunkPos> difference = new HashSet<>(oldChunks);
+			difference.removeAll(newChunks);
+			for (ChunkPos chunk : difference) {
+				level.setChunkForced(chunk.x, chunk.z, false);
+			}
+		}
+
+		for (ServerLevel level : newChunksByLevel.keySet()) {
+			Set<ChunkPos> newChunks = newChunksByLevel.get(level);
+			Set<ChunkPos> oldChunks = oldChunksByLevel.getOrDefault(level, Set.of());
+
+			Set<ChunkPos> difference = new HashSet<>(newChunks);
+			difference.removeAll(oldChunks);
+			for (ChunkPos chunk : difference) {
+				level.setChunkForced(chunk.x, chunk.z, true);
+			}
+		}
+	}
+	public static boolean isSummoned(Entity entity) {
+		return summonedEntity.containsKey(entity); 
+	}
 }

@@ -1,5 +1,6 @@
 package com.example.spdim.core.artifact;
 
+import com.example.spdim.core.functions.Functions;
 import com.example.spdim.core.mechanic.Summon;
 import com.example.spdim.core.mechanic.Invincible;
 import com.example.spdim.core.mechanic.TargetLock;
@@ -39,6 +40,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.Wolf;
 
 import org.jetbrains.annotations.Nullable;
+
+import java.util.HashSet;
 
 public class DriedRose extends Artifact {
 
@@ -244,9 +247,8 @@ public class DriedRose extends Artifact {
 		CompoundTag tag = stack.getTag();
 		if (tag == null || !tag.contains("SummonedUUID")) {
 			return;
-		}
-		Entity entity = level.getEntity(tag.getUUID("SummonedUUID"));
-	
+		}	
+		Entity entity = Functions.findEntity(level.getServer(), tag.getUUID("SummonedUUID"));
 		EntityHitResult hitResult = ProjectileUtil.getEntityHitResult(
 			level,
 			player,
@@ -279,7 +281,7 @@ public class DriedRose extends Artifact {
 		if (tag == null || !tag.contains("SummonedUUID")) {
 			return;
 		}
-		Entity entity = level.getEntity(tag.getUUID("SummonedUUID"));
+		Entity entity = Functions.findEntity(level.getServer(), tag.getUUID("SummonedUUID"));
 		System.out.println(entity);
 		if (entity instanceof LivingEntity livingEntity) {
 			Taunt.control(livingEntity);
@@ -314,14 +316,31 @@ public class DriedRose extends Artifact {
 		if (blockHit.getType() != HitResult.Type.MISS) {
 			Vec3 location = blockHit.getLocation();
 			BlockPos blockPos = getBlockAbove((Level) level, location, (Player) player);
-			Entity entity = level.getEntity(tag.getUUID("SummonedUUID"));
+			Entity entity = Functions.findEntity(level.getServer(), tag.getUUID("SummonedUUID"));
 			if (entity == null) {
 				return;
 			}
+			ServerLevel targetLevel = player.serverLevel();
 			if (blockPos == null) {
-				entity.teleportTo(location.x, location.y + 0.5, location.z);
+				entity.teleportTo(
+					targetLevel,
+					location.x,
+					location.y + 0.5,
+					location.z,
+					new HashSet<>(),
+					entity.getYRot(),
+					entity.getXRot()
+				);
 			} else {
-				entity.teleportTo(blockPos.getX(), blockPos.getY() + 0.5, blockPos.getZ());
+				entity.teleportTo(
+					targetLevel,
+					blockPos.getX(),
+					blockPos.getY() + 0.5,
+					blockPos.getZ(),
+					new HashSet<>(),
+					entity.getYRot(),
+					entity.getXRot()
+				);
 			}
 		}
 	}

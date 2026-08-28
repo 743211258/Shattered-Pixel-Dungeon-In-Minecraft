@@ -1,6 +1,8 @@
 package com.example.spdim.core.mechanic;
 
+import com.example.spdim.core.functions.Functions;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -23,10 +25,10 @@ public class Taunt {
     // Hashmap to store all player with the effect active.
     private static Map<UUID, Float> clientTaunt = new HashMap<>();
     private static Map<UUID, Boolean> clientIsOn = new HashMap<>();
-    private static Map<LivingEntity, Float> taunt = new HashMap<>();
-    private static Map<LivingEntity, Boolean> isOn = new HashMap<>();
-		private static Map<LivingEntity, List<LivingEntity>> tauntEntity = new HashMap<>();
-		private static Map<LivingEntity, List<LivingEntity>> tauntedEntity = new HashMap<>();
+    private static Map<UUID, Float> taunt = new HashMap<>();
+    private static Map<UUID, Boolean> isOn = new HashMap<>();
+		private static Map<UUID, List<UUID>> tauntEntity = new HashMap<>();
+		private static Map<UUID, List<UUID>> tauntedEntity = new HashMap<>();
 		private static final float RADIUS = 16.0F;
 		private static final float COST_PER_TICK = 0.1F;
 		private static final float CHARGE_PER_TICK = 0.025F;
@@ -35,28 +37,28 @@ public class Taunt {
         if (summonedTaunt == null) {
             return;
         }
-        taunt.put(summonedTaunt, 100.0F);
-				isOn.put(summonedTaunt, false);
+        taunt.put(summonedTaunt.getUUID(), 100.0F);
+				isOn.put(summonedTaunt.getUUID(), false);
 				clientTaunt.put(summonedTaunt.getUUID(), 100.0F);
 				clientIsOn.put(summonedTaunt.getUUID(), false);
     }
 
 		public static void control(LivingEntity summonedTaunt) {
-			Boolean current = isOn.get(summonedTaunt);
+			Boolean current = isOn.get(summonedTaunt.getUUID());
 			if (current == null) {
 				return;
 			}
 			boolean next = !current;
-			isOn.put(summonedTaunt, next);
+			isOn.put(summonedTaunt.getUUID(), next);
 			clientIsOn.put(summonedTaunt.getUUID(), next);
 		}
 
-    public static void tick() {
-			Iterator<Map.Entry<LivingEntity, Float>> iterator = taunt.entrySet().iterator();
-			/*Iterator<Map.Entry<LivingEntity, List<LivingEntity>>> tempIterator = tauntedEntity.entrySet().iterator();
+    public static void tick(MinecraftServer server) {
+			Iterator<Map.Entry<UUID, Float>> iterator = taunt.entrySet().iterator();
+			/*Iterator<Map.Entry<UUID, List<UUID>>> tempIterator = tauntedEntity.entrySet().iterator();
 			while (tempIterator.hasNext()) {
-				Map.Entry<LivingEntity, List<LivingEntity>> entry = tempIterator.next();
-				LivingEntity livingEntity = entry.getKey();
+				Map.Entry<UUID, List<UUID>> entry = tempIterator.next();
+				UUID livingEntity = entry.getKey();
 				if (livingEntity instanceof Mob mob) {
 					mob.setTarget(null);
 				}
@@ -65,51 +67,59 @@ public class Taunt {
 			tauntedEntity.clear();
 
 			while (iterator.hasNext()) {
-				Map.Entry<LivingEntity, Float> entry = iterator.next();
-				LivingEntity summonedTaunt = entry.getKey();
-				if (summonedTaunt == null || !summonedTaunt.isAlive() || summonedTaunt.isRemoved()) {
+				Map.Entry<UUID, Float> entry = iterator.next();
+				UUID summonedTaunt = entry.getKey();
+				LivingEntity summonedTauntEntity = Functions.findLivingEntity(server, summonedTaunt);
+				if (summonedTauntEntity == null || !summonedTauntEntity.isAlive() || summonedTauntEntity.isRemoved()) {
 					iterator.remove();
 					isOn.remove(summonedTaunt);
-    			clientTaunt.remove(summonedTaunt.getUUID());
-    			clientIsOn.remove(summonedTaunt.getUUID());
+    			clientTaunt.remove(summonedTaunt);
+    			clientIsOn.remove(summonedTaunt);
+					System.out.println("First");
 					continue;
 				}
 				Float charge = taunt.get(summonedTaunt);
 				if (charge == null) {
+					System.out.println("Second");
 					continue;
 				}
 				float currentCharge = charge.floatValue();
 				Boolean current = isOn.get(summonedTaunt);
 				if (current == null) {
+					System.out.println("Third");
 					continue;
 				}
 				boolean isTauntOn = current.booleanValue();
 				CompoundTag tag = null;
 				UUID wolfUUID = null;
-				if (summonedTaunt instanceof Wolf wolf) {
-					Entity owner = wolf.getOwner();
+				if (summonedTauntEntity instanceof Wolf wolf) {
+					UUID ownerUUID = wolf.getOwnerUUID();
 					wolfUUID = wolf.getUUID();
+					LivingEntity owner = Functions.findLivingEntity(server, ownerUUID);
 					if (owner instanceof ServerPlayer serverPlayer) {
 						ItemStack temp = serverPlayer.getOffhandItem();
 						tag = temp.getTag();
 					}
 				}
 				if (tag == null) {
+					System.out.println("Fourth");
 					continue;
 				}
 				if (!(tag.contains("SummonedUUID"))) {
+					System.out.println("Fifth");
 					continue;
 				}
 				boolean isLeftHandSummonItem = (tag.getUUID("SummonedUUID").equals(wolfUUID));
 				if (isTauntOn) {
 					if (currentCharge - COST_PER_TICK < 0.0F || !isLeftHandSummonItem) {
-						Taunt.control(summonedTaunt);
+						Taunt.control(summonedTauntEntity);
 						currentCharge += CHARGE_PER_TICK;
 						taunt.put(summonedTaunt, currentCharge);
-						clientTaunt.put(summonedTaunt.getUUID(), currentCharge);
+						clientTaunt.put(summonedTaunt, currentCharge);
+						System.out.println("Sixth");
 						continue;
 					}
-					summonedTaunt.addEffect(new MobEffectInstance(
+					summonedTauntEntity.addEffect(new MobEffectInstance(
 						MobEffects.GLOWING,
 						2,
 						0,
@@ -117,17 +127,17 @@ public class Taunt {
 						false
 					));
 	
-					Vec3 center = summonedTaunt.getBoundingBox().getCenter();
+					Vec3 center = summonedTauntEntity.getBoundingBox().getCenter();
 					AABB box = new AABB(new Vec3(center.x - RADIUS, -64, center.z - RADIUS), new Vec3(center.x + RADIUS, 320, center.z + RADIUS));
 					// Detect for living entities
-					List<LivingEntity> entities = summonedTaunt.level().getEntitiesOfClass(
+					List<LivingEntity> entities = summonedTauntEntity.level().getEntitiesOfClass(
 						LivingEntity.class,
 						box,
 						e -> {
-							if (e == summonedTaunt || Invincible.isInvincible(e)) {
+							if (e == summonedTauntEntity || Invincible.isInvincible(e)) {
 								return false;
 							}
-							CompoundTag tempTag = summonedTaunt.getPersistentData();
+							CompoundTag tempTag = summonedTauntEntity.getPersistentData();
 							if (tempTag.contains("Owner") && tempTag.getUUID("Owner").equals(e.getUUID())) {
 								return false;
 							}
@@ -135,18 +145,18 @@ public class Taunt {
 							return ((targetCenter.x - center.x) * (targetCenter.x - center.x) + (targetCenter.z - center.z) * (targetCenter.z - center.z) <= RADIUS * RADIUS);
 						}
 					);
-					List<LivingEntity> livingEntities = new ArrayList<>();
+					List<UUID> livingEntities = new ArrayList<>();
 					for (LivingEntity entity: entities) {
-						if (taunt.containsKey(entity)) {
+						if (taunt.containsKey(entity.getUUID())) {
 							continue;
 						}
-						livingEntities.add(entity);
-						if (tauntedEntity.containsKey(entity)) {
-							tauntedEntity.get(entity).add(summonedTaunt);
+						livingEntities.add(entity.getUUID());
+						if (tauntedEntity.containsKey(entity.getUUID())) {
+							tauntedEntity.get(entity.getUUID()).add(summonedTaunt);
 						} else {
-							List<LivingEntity> temp = new ArrayList<>();
+							List<UUID> temp = new ArrayList<>();
 							temp.add(summonedTaunt);
-							tauntedEntity.put(entity, temp);
+							tauntedEntity.put(entity.getUUID(), temp);
 						}
 					}
 					tauntEntity.put(summonedTaunt, livingEntities);
@@ -161,25 +171,30 @@ public class Taunt {
 					}
 				}
 				taunt.put(summonedTaunt, currentCharge);
-				clientTaunt.put(summonedTaunt.getUUID(), currentCharge);
+				clientTaunt.put(summonedTaunt, currentCharge);
 			}
-			Iterator<Map.Entry<LivingEntity, List<LivingEntity>>> tauntedEntityIterator = tauntedEntity.entrySet().iterator();
+			Iterator<Map.Entry<UUID, List<UUID>>> tauntedEntityIterator = tauntedEntity.entrySet().iterator();
 			while (tauntedEntityIterator.hasNext()) {
-				Map.Entry<LivingEntity, List<LivingEntity>> entry = tauntedEntityIterator.next();
-				LivingEntity targetEntity = entry.getKey();
-				if (!(targetEntity instanceof Mob mob)) {
+				Map.Entry<UUID, List<UUID>> entry = tauntedEntityIterator.next();
+				UUID targetEntity = entry.getKey();
+				LivingEntity targetEntityLiving = Functions.findLivingEntity(server, targetEntity);
+				if (!(targetEntityLiving instanceof Mob mob)) {
 					continue;
 				}
 				Vec3 targetCenter = mob.getBoundingBox().getCenter();
-				List<LivingEntity> LivingEntities = entry.getValue();
+				List<UUID> LivingEntities = entry.getValue();
 				double closest = 10000.0D;
 				LivingEntity target = null;
-				for (LivingEntity entity : LivingEntities) {
-					Vec3 center = entity.getBoundingBox().getCenter();
+				for (UUID entity : LivingEntities) {
+					LivingEntity entityLiving = Functions.findLivingEntity(server, entity);
+					if (entityLiving == null) {
+						continue;
+					}
+					Vec3 center = entityLiving.getBoundingBox().getCenter();
 					double current = (targetCenter.x - center.x) * (targetCenter.x - center.x) + (targetCenter.z - center.z) * (targetCenter.z - center.z); 
 					if (current < closest) {
 						closest = current;
-						target = entity;
+						target = entityLiving;
 					}
 				}
 				mob.setTarget(target);
@@ -188,10 +203,10 @@ public class Taunt {
 
     public static boolean canAttack(Entity attacker, Entity defender) {
       if (attacker instanceof LivingEntity attackLivingEntity && defender instanceof LivingEntity defendLivingEntity) {
-        if (!tauntedEntity.containsKey(attackLivingEntity)) {
+        if (!tauntedEntity.containsKey(attackLivingEntity.getUUID())) {
 					return true;
         }
-				return tauntedEntity.get(attackLivingEntity).contains(defendLivingEntity);
+				return tauntedEntity.get(attackLivingEntity.getUUID()).contains(defendLivingEntity.getUUID());
       }	
       return true;
     }

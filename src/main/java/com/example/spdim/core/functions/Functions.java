@@ -4,7 +4,10 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.ChunkPos;
 
+import java.util.Set;
+import java.util.HashSet;
 import java.util.UUID;
 
 public class Functions {
@@ -25,4 +28,16 @@ public class Functions {
 		}
 		return null;
 	}
+
+	public static void addSurroundingChunks(ChunkPos center, Set<ChunkPos> chunks) {
+		for (int dx = -1; dx <= 1; dx++) {
+			for (int dz = -1; dz <= 1; dz++) {
+				chunks.add(new ChunkPos(
+					center.x + dx,
+					center.z + dz
+				));
+			}
+		}
+	}
+
 }
