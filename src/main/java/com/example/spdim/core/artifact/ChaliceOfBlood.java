@@ -2,6 +2,7 @@ package com.example.spdim.core.artifact;
 
 import com.example.spdim.ExampleMod;
 import com.example.spdim.core.Artifact;
+import com.example.spdim.core.mechanic.CooldownSystem;
 import com.example.spdim.core.registry.ModEffects;
 import com.example.spdim.core.network.ChaliceOfBloodOnUsePacket;
 import com.example.spdim.core.network.MyModNetwork;
@@ -32,6 +33,8 @@ public class ChaliceOfBlood extends Artifact {
     public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, world, entity, slot, selected);
         stack.setHoverName(Component.translatable("item.spdim.chalice_of_blood"));
+        long now = world.getGameTime();
+        CooldownSystem.createCooldownState(stack, 1, 1, 100, now);
     }
 
     public void onUseClientSide(Level world, Player player, ItemStack stack) {

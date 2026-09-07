@@ -2,6 +2,7 @@ package com.example.spdim.core.artifact;
 
 import com.example.spdim.core.functions.Functions;
 import com.example.spdim.core.mechanic.Summon;
+import com.example.spdim.core.mechanic.CooldownSystem;
 import com.example.spdim.core.mechanic.Invincible;
 import com.example.spdim.core.mechanic.TargetLock;
 import com.example.spdim.core.mechanic.Taunt;
@@ -87,6 +88,9 @@ public class DriedRose extends Artifact {
 		if (world.isClientSide()) {
 			return;
 		}
+		long now = world.getGameTime();
+		CooldownSystem.createCooldownState(stack, 1, 1, COOLDOWN, now);
+		CooldownSystem.tryRegainAnyEnergy(stack, 1, world);
 
 		initializeNBT(stack, world);
 
@@ -122,7 +126,7 @@ public class DriedRose extends Artifact {
 				onSummonedDeath(stack, world);
 			}
 		}
-		if (getState(stack) == STATE.COOLDOWN && serverLevel.getGameTime() - tag.getLong("StartChargingTime") > COOLDOWN) {
+		if (getState(stack) == STATE.COOLDOWN && CooldownSystem.hasPositiveEnergy(stack)) {
 			cooldownFinish(stack);
 		}
 		reconciliation(tag, stack, serverLevel, serverPlayer);
@@ -132,9 +136,6 @@ public class DriedRose extends Artifact {
 	// NBT SummonedUUID, which stores the UUID of the summoned, will be added to the artifact upon summoning and deleted upon death.
 	private void initializeNBT(ItemStack stack, Level world) {
 		CompoundTag tag = stack.getOrCreateTag();
-		if (!tag.contains("StartChargingTime")) {
-			tag.putLong("StartChargingTime", world.getGameTime() - COOLDOWN);
-		}
 		if (!tag.contains("State")) {
 			tag.putString("State", "IDLE");
 		}
@@ -166,12 +167,10 @@ public class DriedRose extends Artifact {
 
 	// Reconcile the COOLDOWN state.
 	private void reconcileCooldown(CompoundTag tag, ItemStack stack, ServerLevel serverLevel) {
-		long startTime = tag.getLong("StartChargingTime");
-		long now = serverLevel.getGameTime();
 		if (tag.contains("SummonedUUID")) {
 			tag.remove("SummonedUUID");
 		}
-		if (now - startTime >= COOLDOWN) {
+		if (CooldownSystem.hasPositiveEnergy(stack)) {
 			cooldownFinish(stack);
 		}
 	}
@@ -356,7 +355,7 @@ public class DriedRose extends Artifact {
 			return;
 		}
 		tag.remove("SummonedUUID");
-		tag.putLong("StartChargingTime", world.getGameTime());
+		CooldownSystem.consumeAnyEnergy(stack, 1, world);
 		tag.putString("State", "COOLDOWN");
 	}
 

@@ -2,10 +2,12 @@ package com.example.spdim.core.artifact;
 
 import com.example.spdim.core.Artifact;
 import com.example.spdim.core.registry.ModEffects;
+import com.example.spdim.core.mechanic.CooldownSystem;
 import com.example.spdim.core.mechanic.Invincible;
 import com.example.spdim.core.network.FreezeOthersPacket;
 import com.example.spdim.core.network.FreezeSelfPacket;
 import com.example.spdim.core.network.MyModNetwork;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -17,6 +19,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.Vec3;
 
 public class TimekeepersHourglass extends Artifact {
@@ -28,9 +31,7 @@ public class TimekeepersHourglass extends Artifact {
 
     @Override
     public boolean isApplicable(ItemStack stack, Level world) {
-        CompoundTag tag = stack.getOrCreateTag();
-        long lastTime = tag.getLong("LastChargeTime");
-        return world.getGameTime() - lastTime >= maxCooldown;
+        return CooldownSystem.hasPositiveEnergy(stack);
     }
 
     @Override
@@ -41,15 +42,9 @@ public class TimekeepersHourglass extends Artifact {
         if (world.isClientSide) {
             return;
         }
-
-        initializeNBT(stack, world);
-    }
-
-    protected void initializeNBT(ItemStack stack, Level world) {
-        CompoundTag tag = stack.getOrCreateTag();
-        if (!tag.contains("LastChargeTime")) {
-            tag.putLong("LastChargeTime", world.getGameTime() - 900);
-        }
+        long now = world.getGameTime();
+        CooldownSystem.createCooldownState(stack, 1, 1, maxCooldown, now);
+        CooldownSystem.tryRegainAnyEnergy(stack, 1, world);
     }
 
     public void FreezeOthersClient(Level world, Player player, ItemStack stack) {
@@ -58,7 +53,7 @@ public class TimekeepersHourglass extends Artifact {
         }
     }
 
-    public void FreezeOthersServerSide(ServerPlayer player) {
+    public void FreezeOthersServerSide(ServerPlayer player, ServerLevel serverLevel) {
         ItemStack stack = player.getOffhandItem();
         if (!isApplicable(stack, player.level())) {
             return;
@@ -82,11 +77,7 @@ public class TimekeepersHourglass extends Artifact {
         } else {
             return;
         }
-        CompoundTag tag = stack.getTag();
-        if (tag == null) {
-            return;
-        }
-        tag.putLong("LastChargeTime", player.level().getGameTime());
+        CooldownSystem.consumeAnyEnergy(stack, 1, serverLevel);
     }
 
     public void FreezeMyselfClient(Level world, Player player, ItemStack stack) {
@@ -96,15 +87,12 @@ public class TimekeepersHourglass extends Artifact {
         }
     }
 
-    public void FreezeMyselfServerSide(ServerPlayer player) {
+    public void FreezeMyselfServerSide(ServerPlayer player, ServerLevel serverLevel) {
         ItemStack stack = player.getOffhandItem();
-        stack.getOrCreateTag();
-        CompoundTag tag = stack.getOrCreateTag();
         if (!isApplicable(stack, player.level())) {
             return;
         }
-
-        tag.putLong("LastChargeTime", player.level().getGameTime());
+        CooldownSystem.consumeAnyEnergy(stack, 1, serverLevel);
         player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 200, 0, false, false)); 
         player.addEffect(new MobEffectInstance(ModEffects.INVINCIBLE.get(), 200));
     }

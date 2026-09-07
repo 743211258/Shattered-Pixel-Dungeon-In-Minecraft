@@ -32,7 +32,7 @@ public class FreezeOthersPacket {
             var stack = player.getOffhandItem();
             // Check if the player's offhand is holding timekeeper's hourglass
             if (!stack.isEmpty() && stack.getItem() instanceof TimekeepersHourglass item) {
-                item.FreezeOthersServerSide(player);
+                item.FreezeOthersServerSide(player, player.serverLevel());
             }
         });
         ctx.get().setPacketHandled(true);

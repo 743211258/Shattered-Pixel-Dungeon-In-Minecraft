@@ -16,6 +16,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 
 import com.example.spdim.core.Artifact;
+import com.example.spdim.core.mechanic.CooldownSystem;
 import com.example.spdim.core.mechanic.Invincible;
 import com.example.spdim.core.network.MyModNetwork;
 import com.example.spdim.core.network.StealPacket;
@@ -39,9 +40,7 @@ public class MasterThievesArmband extends Artifact {
 
 	@Override
 	public boolean isApplicable(ItemStack stack, Level world) {
-		CompoundTag tag = stack.getTag();
-		long lastTime = tag.getLong("LastChargeTime");
-		return world.getGameTime() - lastTime >= ARMBAND_COOLDOWN; 
+		return CooldownSystem.hasPositiveEnergy(stack);
 	}
 
 	@Override
@@ -52,15 +51,9 @@ public class MasterThievesArmband extends Artifact {
 		if (world.isClientSide) {
 			return;
 		}
-
- 		initializeNBT(stack, world);
-	}
-
-	protected void initializeNBT(ItemStack stack, Level world) {
-		CompoundTag tag = stack.getOrCreateTag();
-		if (!tag.contains("LastChargeTime")) {
-			tag.putLong("LastChargeTime", world.getGameTime() - ARMBAND_COOLDOWN);
-		}
+		long now = world.getGameTime();
+		CooldownSystem.createCooldownState(stack, 1, 1, ARMBAND_COOLDOWN, now);
+		CooldownSystem.tryRegainAnyEnergy(stack, 1, world);
 	}
 
 	public void stealClientSide(ItemStack stack, Level level, Player player) {
@@ -107,10 +100,6 @@ public class MasterThievesArmband extends Artifact {
 		} else {
 			return;
 		}
-		CompoundTag tag = stack.getTag();
-		if (tag == null) {
-			return;
-		}
-		tag.putLong("LastChargeTime", player.level().getGameTime());
+		CooldownSystem.consumeAnyEnergy(stack, 1, level);
 	}
 }
