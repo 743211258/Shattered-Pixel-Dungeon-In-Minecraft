@@ -7,6 +7,7 @@ import com.example.spdim.core.mechanic.Invincible;
 import com.example.spdim.core.mechanic.TargetLock;
 import com.example.spdim.core.mechanic.Taunt;
 import com.example.spdim.core.Artifact;
+import com.example.spdim.core.Macro;
 import com.example.spdim.core.network.DriedRoseSummonPacket;
 import com.example.spdim.core.network.DriedRoseControlPacket;
 import com.example.spdim.core.network.DriedRoseTauntPacket;
@@ -46,16 +47,6 @@ import java.util.HashSet;
 
 public class DriedRose extends Artifact {
 
-	public enum STATE {
-		IDLE,
-		USING,
-		COOLDOWN
-	}
-
-	protected final int COOLDOWN = 2400;
-	protected final int CONTROL_RADIUS = 100;
-	protected final int TELEPORT_RADIUS = 200;
-
 	public DriedRose(Properties properties) {
 		super(properties);
 	}
@@ -63,19 +54,19 @@ public class DriedRose extends Artifact {
 	// The artifact is only applicable when it is in IDLE state.
 	@Override
 	public boolean isApplicable(ItemStack stack, Level world) {
-		STATE current = getState(stack);
+		Macro.STATE current = getState(stack);
 		if (current == null) {
 			return false;
 		}
-		return current == STATE.IDLE;
+		return current == Macro.STATE.IDLE;
 	}
 
-	public STATE getState(ItemStack stack) {
+	public Macro.STATE getState(ItemStack stack) {
 		CompoundTag tag = stack.getTag();
 		if (tag == null || !tag.contains("State")) {
 			return null;
 		}
-		return STATE.valueOf(tag.getString("State"));
+		return Macro.STATE.valueOf(tag.getString("State"));
 	}
 
 	// During every tick, initialize the NBT if needed,
@@ -89,7 +80,7 @@ public class DriedRose extends Artifact {
 			return;
 		}
 		long now = world.getGameTime();
-		CooldownSystem.createCooldownState(stack, 1, 1, COOLDOWN, now);
+		CooldownSystem.createCooldownState(stack, 1, 1, Macro.DRIED_ROSE_COOLDOWN, now);
 		CooldownSystem.tryRegainAnyEnergy(stack, 1, world);
 
 		initializeNBT(stack, world);
@@ -105,7 +96,7 @@ public class DriedRose extends Artifact {
 		if (!(entity instanceof ServerPlayer serverPlayer)) {
 			return;
 		}
-		if (getState(stack) == STATE.USING && tag.contains("SummonedUUID")) {
+		if (getState(stack) == Macro.STATE.USING && tag.contains("SummonedUUID")) {
     	MinecraftServer server = serverLevel.getServer();
 			Entity summoned = null;
 			for (ServerLevel level : server.getAllLevels()) {
@@ -118,15 +109,11 @@ public class DriedRose extends Artifact {
 	    boolean isAlive = summoned != null && summoned.isAlive();
     	boolean isRemoved = summoned != null && summoned.isRemoved();
 
-    	System.out.println("summoned == null: " + isNull);
-    	System.out.println("summoned.isAlive(): " + isAlive);
-    	System.out.println("summoned.isRemoved(): " + isRemoved);
-
 			if (summoned == null || !summoned.isAlive() || summoned.isRemoved()) { 
 				onSummonedDeath(stack, world);
 			}
 		}
-		if (getState(stack) == STATE.COOLDOWN && CooldownSystem.hasPositiveEnergy(stack)) {
+		if (getState(stack) == Macro.STATE.COOLDOWN && CooldownSystem.hasPositiveEnergy(stack)) {
 			cooldownFinish(stack);
 		}
 		reconciliation(tag, stack, serverLevel, serverPlayer);
@@ -232,17 +219,16 @@ public class DriedRose extends Artifact {
 		if (!world.isClientSide()) {
 			return;
 		}
-		if (getState(stack) == STATE.USING) {
+		if (getState(stack) == Macro.STATE.USING) {
 			MyModNetwork.CHANNEL.sendToServer(new DriedRoseControlPacket());
 		}
 	}
 
 	public void controlServerSide(ItemStack stack, ServerLevel level, ServerPlayer player) {
-		System.out.println("Received");
 		Vec3 start = player.getEyePosition();
 		Vec3 look = player.getLookAngle();
-		Vec3 end = start.add(look.scale(CONTROL_RADIUS));
-		AABB box = player.getBoundingBox().expandTowards(look.scale(CONTROL_RADIUS)).inflate(1.0D);
+		Vec3 end = start.add(look.scale(Macro.DRIED_ROSE_CONTROL_CONTROL_RANGE));
+		AABB box = player.getBoundingBox().expandTowards(look.scale(Macro.DRIED_ROSE_CONTROL_CONTROL_RANGE)).inflate(1.0D);
 		CompoundTag tag = stack.getTag();
 		if (tag == null || !tag.contains("SummonedUUID")) {
 			return;
@@ -258,7 +244,6 @@ public class DriedRose extends Artifact {
 		);
 		if (hitResult != null && hitResult.getEntity() instanceof LivingEntity livingEntity) {	
 			if (entity instanceof Wolf wolf) {
-				System.out.println("OOO");
 				wolf.setTarget(livingEntity);
 				TargetLock.lockTarget(wolf, livingEntity);
 			}
@@ -269,7 +254,7 @@ public class DriedRose extends Artifact {
 		if (!world.isClientSide()) {
 			return;
 		}
-		if (getState(stack) == STATE.USING) {
+		if (getState(stack) == Macro.STATE.USING) {
 			MyModNetwork.CHANNEL.sendToServer(new DriedRoseTauntPacket());
 		}
 	
@@ -281,7 +266,6 @@ public class DriedRose extends Artifact {
 			return;
 		}
 		Entity entity = Functions.findEntity(level.getServer(), tag.getUUID("SummonedUUID"));
-		System.out.println(entity);
 		if (entity instanceof LivingEntity livingEntity) {
 			Taunt.control(livingEntity);
 		}
@@ -291,7 +275,7 @@ public class DriedRose extends Artifact {
 		if (!world.isClientSide()) {
 			return;
 		}
-		if (getState(stack) == STATE.USING) {
+		if (getState(stack) == Macro.STATE.USING) {
 			MyModNetwork.CHANNEL.sendToServer(new DriedRoseTeleportPacket());
 		}
 	}
@@ -303,7 +287,7 @@ public class DriedRose extends Artifact {
 		}
 		Vec3 start = player.getEyePosition();
 		Vec3 look = player.getLookAngle();
-		Vec3 end = start.add(look.scale(TELEPORT_RADIUS));
+		Vec3 end = start.add(look.scale(Macro.DRIED_ROSE_TELEPORT_CONTROL_RANGE));
 		// Search for blocks
 		BlockHitResult blockHit = level.clip(new ClipContext(
 			start,

@@ -4,6 +4,7 @@ import com.example.spdim.core.Artifact;
 import com.example.spdim.core.artifact.DriedRose;
 import com.example.spdim.core.data_structure.CooldownState;
 import com.example.spdim.core.data_structure.IntVec2;
+import com.example.spdim.core.Macro;
 import com.example.spdim.core.mechanic.Rooted;
 import com.example.spdim.core.mechanic.CooldownSystem;
 import com.example.spdim.core.mechanic.Freeze;
@@ -97,7 +98,7 @@ public class ClientEvents {
                     IntVec2 tempPos = new IntVec2(x, y);
                     InventoryItemCooldownCache.put(tempPos, percentage);
                 }
-                if (stack.getItem() instanceof DriedRose rose && rose.getState(stack) == DriedRose.STATE.USING) {
+                if (stack.getItem() instanceof DriedRose rose && rose.getState(stack) == Macro.STATE.USING) {
                     CompoundTag tag = stack.getTag();
                     if (tag == null) {
                         continue;
@@ -166,7 +167,7 @@ public class ClientEvents {
                     IntVec2 tempPos = new IntVec2(x, y);
                     HotBarItemCooldownCache.put(tempPos, percentage);
                 }
-                if (artifact instanceof DriedRose rose && rose.getState(stack) == DriedRose.STATE.USING) {
+                if (artifact instanceof DriedRose rose && rose.getState(stack) == Macro.STATE.USING) {
                     CompoundTag tag = stack.getTag();
                     if (tag == null) {
                         continue;

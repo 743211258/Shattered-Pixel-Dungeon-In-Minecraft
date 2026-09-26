@@ -1,38 +1,42 @@
 package com.example.spdim.core.network;
 
 import net.minecraft.world.item.ItemStack;
-import com.example.spdim.core.artifact.DriedRose;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 import java.util.function.Supplier;
 
+import com.example.spdim.core.artifact.DriedRose;
+import com.example.spdim.SPDIM;
+
 public class DriedRoseTeleportPacket {
 
-        public DriedRoseTeleportPacket() {
-                // Does not contain any additional information.
-        }
+	public DriedRoseTeleportPacket() {
+		// Does not contain any additional information.
+	}
 
-        public static void encode(DriedRoseTeleportPacket msg, FriendlyByteBuf buf) {
-                // Empty since there is no data.
+	public static void encode(DriedRoseTeleportPacket msg, FriendlyByteBuf buf) {
+		// Empty since there is no data.
   }
 
-        public static DriedRoseTeleportPacket decode(FriendlyByteBuf buf) {
-                return new DriedRoseTeleportPacket();
-        }
+	public static DriedRoseTeleportPacket decode(FriendlyByteBuf buf) {
+		return new DriedRoseTeleportPacket();
+	}
 
-        public static void handle(DriedRoseTeleportPacket msg, Supplier<NetworkEvent.Context> ctx) {
-                ctx.get().enqueueWork(() -> {
-                        ServerPlayer player = ctx.get().getSender();
-                        if (player == null) {
-                                return;
-                        }
-                        ItemStack stack = player.getOffhandItem();
-                        if (!stack.isEmpty() && stack.getItem() instanceof DriedRose item) {
-                                item.teleportServerSide(stack, player.serverLevel(), player);
-                        }
-                });
-        ctx.get().setPacketHandled(true);
-        }
+	public static void handle(DriedRoseTeleportPacket msg, Supplier<NetworkEvent.Context> ctx) {
+		ctx.get().enqueueWork(() -> {
+			ServerPlayer player = ctx.get().getSender();
+			if (player == null) {
+				return;
+			}
+			SPDIM.LOGGER.debug("Received DriedRoseTeleportPacket from {}", player.getGameProfile().getName());
+
+			ItemStack stack = player.getOffhandItem();
+			if (!stack.isEmpty() && stack.getItem() instanceof DriedRose item) {
+				item.teleportServerSide(stack, player.serverLevel(), player);
+			}
+		});
+	ctx.get().setPacketHandled(true);
+	}
 }
 

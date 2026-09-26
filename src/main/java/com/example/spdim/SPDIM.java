@@ -43,8 +43,8 @@ import com.example.spdim.core.wand.energyWand.WandOfLightning;
 import com.example.spdim.core.enchantment.Viscosity;
 import com.example.spdim.core.registry.ModEffects;
 // The value here should match an entry in the META-INF/mods.toml file
-@Mod(ExampleMod.MODID)
-public class ExampleMod
+@Mod(SPDIM.MODID)
+public class SPDIM
 {
     // Define mod id in a common place for everything to reference
     public static final String MODID = "spdim";
@@ -57,7 +57,7 @@ public class ExampleMod
                             .build("blast_wave"));
 
     // Directly reference a slf4j logger
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
     // Create a Deferred Register to hold Blocks which will all be registered under the "examplemod" namespace
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
     // Create a Deferred Register to hold Items which will all be registered under the "examplemod" namespace
@@ -99,7 +99,7 @@ public class ExampleMod
     public static final RegistryObject<Item> BLAST_WAVE_ITEM = ITEMS.register("blast_wave_item",
             () -> new Item(new Item.Properties())
     );
-    public ExampleMod(FMLJavaModLoadingContext context)
+    public SPDIM(FMLJavaModLoadingContext context)
     {
         IEventBus modEventBus = context.getModEventBus();
 

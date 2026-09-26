@@ -6,7 +6,8 @@ import com.example.spdim.core.projectile.BlastWave;
 import net.minecraft.nbt.CompoundTag;
 
 import net.minecraft.network.chat.Component;
-import com.example.spdim.ExampleMod;
+import com.example.spdim.SPDIM;
+import com.example.spdim.core.Macro;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.entity.player.Player;
@@ -14,9 +15,6 @@ import net.minecraft.world.phys.Vec3;
 
 
 public class WandOfBlastWave extends EnergyWand{
-
-    private final float EXPLODING_RADIUS = 5.0F;
-    private final float SPEED = 3.0F;
 
     public WandOfBlastWave(Properties properties, int maxEnergy, int energyCost, int cooldown, Component name) {
         super(properties, maxEnergy, energyCost, cooldown, name);
@@ -28,18 +26,18 @@ public class WandOfBlastWave extends EnergyWand{
             // Cast happens only if the wand is charged
             if (CooldownSystem.hasPositiveEnergy(stack)) {
                 // Generate a blast wave entity at eye level
-                BlastWave wave = new BlastWave(ExampleMod.BLAST_WAVE.get(), world);
+                BlastWave wave = new BlastWave(SPDIM.BLAST_WAVE.get(), world);
 
                 // Set the initial position, direction, and explosion radius
                 Vec3 spawnPos = player.getEyePosition(1.0F);
                 wave.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
-                wave.setExplodeRadius(EXPLODING_RADIUS);
+                wave.setExplodeRadius(Macro.WAND_OF_BLAST_WAVE_EXPLODE_RADIUS);
 
                 // Set the owner for mob AI (Mobs will attack the caster)
                 wave.setOwner(player);
 
                 // Set the speed
-                wave.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, SPEED,0.0F);
+                wave.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, Macro.WAND_OF_BLAST_WAVE_SPEED, 0.0F);
                 wave.hasImpulse = true;
 
                 // Add the wave to the player's world

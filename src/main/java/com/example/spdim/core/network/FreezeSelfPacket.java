@@ -1,6 +1,8 @@
 package com.example.spdim.core.network;
 
 import com.example.spdim.core.artifact.TimekeepersHourglass;
+import com.example.spdim.SPDIM;
+
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -28,6 +30,7 @@ public class FreezeSelfPacket {
             if (player == null) {
                 return;
             }
+            SPDIM.LOGGER.debug("Received FreezeSelfPacket from {}", player.getGameProfile().getName());
 
             // Check if the player's offhand is holding timekeeper's hourglass
             ItemStack stack = player.getOffhandItem();

@@ -3,6 +3,8 @@ package com.example.spdim.core.projectile;
 import java.util.List;
 
 import com.example.spdim.core.mechanic.Invincible;
+import com.example.spdim.core.Macro;
+
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -13,7 +15,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.level.ClipContext;
 
-import com.example.spdim.ExampleMod;
+import com.example.spdim.SPDIM;
 
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -30,8 +32,6 @@ public class BlastWave extends ThrowableProjectile implements ItemSupplier{
 
     private double explodeRadius;
     private static final EntityDataAccessor<Float> EXPLODE_RADIUS = SynchedEntityData.defineId(BlastWave.class, EntityDataSerializers.FLOAT);
-    private static double DAMAGE_MULTIPLIER = 1.0F;
-    private static double KNOCKBACK_MULTIPLIER = 0.2F;
 
     public BlastWave(EntityType<? extends ThrowableProjectile> type, Level level) {
         super(type, level);
@@ -169,7 +169,7 @@ public class BlastWave extends ThrowableProjectile implements ItemSupplier{
                 magnitude = livingEntity.getAttributeValue(Attributes.ARMOR);
             }
             DamageSource source = entity.level().damageSources().explosion(this, getOwner());
-            entity.hurt(source, (float) (2.0D + magnitude * DAMAGE_MULTIPLIER));
+            entity.hurt(source, (float) (2.0D + magnitude * Macro.BLAST_WAVE_DAMAGE_MULTIPLIER));
             Vec3 direction = entity.position().subtract(pos);
             double radius = direction.length();
             if (radius > explodeRadius) {
@@ -182,7 +182,7 @@ public class BlastWave extends ThrowableProjectile implements ItemSupplier{
 
 
             double factor = Math.max(0, 1.0 - ((radius / explodeRadius) * (radius / explodeRadius)));
-            Vec3 pushForce = direction.normalize().scale((float) ((10.0D - KNOCKBACK_MULTIPLIER * magnitude) * factor));
+            Vec3 pushForce = direction.normalize().scale((float) ((10.0D - Macro.BLAST_WAVE_KNOCKBACK_MULTIPLIER * magnitude) * factor));
             if (isBlockedByBlock(pos, entity)) {
                 pushForce = pushForce.scale(0.2);
             }
@@ -203,7 +203,7 @@ public class BlastWave extends ThrowableProjectile implements ItemSupplier{
     }
     @Override
     public ItemStack getItem() {
-        return new ItemStack(ExampleMod.BLAST_WAVE_ITEM.get());
+        return new ItemStack(SPDIM.BLAST_WAVE_ITEM.get());
     }
 
     private boolean isBlockedByBlock(Vec3 from, Entity entity) {

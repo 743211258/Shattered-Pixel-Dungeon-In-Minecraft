@@ -1,11 +1,13 @@
 package com.example.spdim.core.network;
 
 import net.minecraft.world.item.ItemStack;
-import com.example.spdim.core.artifact.DriedRose;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 import java.util.function.Supplier;
+
+import com.example.spdim.core.artifact.DriedRose;
+import com.example.spdim.SPDIM;
 
 public class DriedRoseControlPacket {
 
@@ -27,6 +29,7 @@ public class DriedRoseControlPacket {
 			if (player == null) {
 				return;
 			}
+			SPDIM.LOGGER.debug("Received DriedRoseControlPacket from {}", player.getGameProfile().getName());
 			ItemStack stack = player.getOffhandItem();
 			if (!stack.isEmpty() && stack.getItem() instanceof DriedRose item) {
 				item.controlServerSide(stack, player.serverLevel(), player);

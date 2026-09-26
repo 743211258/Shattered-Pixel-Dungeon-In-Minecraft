@@ -1,6 +1,6 @@
 package com.example.spdim.core.event;
 
-import com.example.spdim.ExampleMod;
+import com.example.spdim.SPDIM;
 import com.example.spdim.core.renderer.BlastWaveRenderer;
 import com.mojang.blaze3d.platform.InputConstants;
 
@@ -32,7 +32,7 @@ public class ClientModEvents {
     );
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerEntityRenderer(ExampleMod.BLAST_WAVE.get(), ctx -> new BlastWaveRenderer(ctx));
+        event.registerEntityRenderer(SPDIM.BLAST_WAVE.get(), ctx -> new BlastWaveRenderer(ctx));
     }
     @SubscribeEvent
     public static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {

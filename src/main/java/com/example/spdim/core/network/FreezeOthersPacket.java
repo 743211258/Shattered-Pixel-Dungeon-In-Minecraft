@@ -1,10 +1,12 @@
 package com.example.spdim.core.network;
 
-import com.example.spdim.core.artifact.TimekeepersHourglass;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 import java.util.function.Supplier;
+
+import com.example.spdim.core.artifact.TimekeepersHourglass;
+import com.example.spdim.SPDIM;
 
 public class FreezeOthersPacket {
 
@@ -24,10 +26,9 @@ public class FreezeOthersPacket {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
             if (player == null) {
-                System.out.println("[DEBUG] FreezeOthersPacket received but player is null!");
                 return;
             }
-            System.out.println("[DEBUG] FreezeOthersPacket received from player: " + player.getName().getString());
+            SPDIM.LOGGER.debug("Received FreezeOthersPacket from {}", player.getGameProfile().getName());
 
             var stack = player.getOffhandItem();
             // Check if the player's offhand is holding timekeeper's hourglass

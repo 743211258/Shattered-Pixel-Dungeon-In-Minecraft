@@ -68,7 +68,6 @@ public final class Summon {
 			Player summoner = entry.getValue();
 			
 			if (summoned == null || !summoned.isAlive() || summoned.isRemoved()) {
-				System.out.println("Triggers\n");
 				iterator.remove();
 				continue;
 			}

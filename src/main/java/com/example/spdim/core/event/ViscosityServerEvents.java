@@ -23,7 +23,7 @@ import com.example.spdim.core.enchantment.Viscosity;
 import com.example.spdim.core.mechanic.ViscosityEffect;
 import com.example.spdim.core.registry.ModDamageSources;
 import com.example.spdim.core.registry.ModEffects;
-import com.example.spdim.ExampleMod;
+import com.example.spdim.SPDIM;
 
 @Mod.EventBusSubscriber(modid = "spdim", bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ViscosityServerEvents {
@@ -40,33 +40,19 @@ public class ViscosityServerEvents {
 	public static void onDamage(LivingDamageEvent event) {
 		LivingEntity livingEntity = event.getEntity();
 		ItemStack chestplate = livingEntity.getItemBySlot(EquipmentSlot.CHEST);
-		int level = chestplate.getEnchantmentLevel(ExampleMod.VISCOSITY.get());
-		System.out.println(level);
+		int level = chestplate.getEnchantmentLevel(SPDIM.VISCOSITY.get());
 		if (level <= 0) {
 			return;
 		}
 		DamageSource source = ModDamageSources.viscosity(livingEntity.level());
 
-		System.out.println(
-				source.is(DamageTypeTags.BYPASSES_ARMOR)
-		);
-
-		System.out.println(
-				source.is(DamageTypeTags.BYPASSES_EFFECTS)
-		);
-
-		System.out.println(
-				source.is(DamageTypeTags.BYPASSES_ENCHANTMENTS)
-		);
 		if (event.getSource().is(ModDamageSources.DAMAGE_OVER_TIME)) {
 			return;
 		}	
 		float absorption = livingEntity.getAbsorptionAmount();
 		float damage = event.getAmount() + (absorptionBeforeDamage - absorption);
-		System.out.println("damage: " + damage);
 		float viscosityDamage = damage; //* ((float) (level + 1) / (float) (level + 6));
 		float damageToLivingEntity = damage - viscosityDamage;
-		System.out.println("damageToLivingEntity: " + damageToLivingEntity);
 		event.setAmount(damageToLivingEntity);
 		livingEntity.setAbsorptionAmount(absorptionBeforeDamage);
 		absorption = livingEntity.getAbsorptionAmount();

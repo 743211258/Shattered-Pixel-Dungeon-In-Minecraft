@@ -1,12 +1,14 @@
 package com.example.spdim.core.network;
 
-import com.example.spdim.core.artifact.ChaliceOfBlood;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
+
+import com.example.spdim.core.artifact.ChaliceOfBlood;
+import com.example.spdim.SPDIM;
 
 public class ChaliceOfBloodOnUsePacket {
 
@@ -28,6 +30,7 @@ public class ChaliceOfBloodOnUsePacket {
             if (player == null) {
                 return;
             }
+            SPDIM.LOGGER.debug("Received ChaliceOfBloodOnUsePacket from {}", player.getGameProfile().getName());
 
             // Check if the player's offhand is holding chalice of blood.
             ItemStack offHand = player.getOffhandItem();

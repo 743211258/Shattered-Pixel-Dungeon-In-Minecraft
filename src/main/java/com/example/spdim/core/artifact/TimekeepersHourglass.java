@@ -4,6 +4,7 @@ import com.example.spdim.core.Artifact;
 import com.example.spdim.core.registry.ModEffects;
 import com.example.spdim.core.mechanic.CooldownSystem;
 import com.example.spdim.core.mechanic.Invincible;
+import com.example.spdim.core.Macro;
 import com.example.spdim.core.network.FreezeOthersPacket;
 import com.example.spdim.core.network.FreezeSelfPacket;
 import com.example.spdim.core.network.MyModNetwork;
@@ -23,7 +24,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.Vec3;
 
 public class TimekeepersHourglass extends Artifact {
-    protected final int maxCooldown = 900;
 
     public TimekeepersHourglass(Properties properties) {
         super(properties);
@@ -43,7 +43,7 @@ public class TimekeepersHourglass extends Artifact {
             return;
         }
         long now = world.getGameTime();
-        CooldownSystem.createCooldownState(stack, 1, 1, maxCooldown, now);
+        CooldownSystem.createCooldownState(stack, 1, 1, Macro.TIMEKEEPERS_HOURGLASS_COOLDOWN, now);
         CooldownSystem.tryRegainAnyEnergy(stack, 1, world);
     }
 
@@ -61,7 +61,7 @@ public class TimekeepersHourglass extends Artifact {
 
         Vec3 start = player.getEyePosition(1.0F);
         Vec3 look = player.getLookAngle();
-        double range = 50.0;
+        double range = Macro.TIMEKEEPERS_HOURGLASS_CONTROL_RANGE;
         Vec3 end = start.add(look.scale(range));
 
         var entityHit = ProjectileUtil.getEntityHitResult(
@@ -73,7 +73,7 @@ public class TimekeepersHourglass extends Artifact {
                 e -> e instanceof LivingEntity && e != player
         );
         if (entityHit != null && entityHit.getEntity() instanceof LivingEntity target && !Invincible.isInvincible(target)) {
-            target.addEffect(new MobEffectInstance(ModEffects.FREEZE.get(), 100));
+            target.addEffect(new MobEffectInstance(ModEffects.FREEZE.get(), Macro.TIMEKEEPERS_FREEZE_SELF_DURATION));
         } else {
             return;
         }
@@ -94,6 +94,6 @@ public class TimekeepersHourglass extends Artifact {
         }
         CooldownSystem.consumeAnyEnergy(stack, 1, serverLevel);
         player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 200, 0, false, false)); 
-        player.addEffect(new MobEffectInstance(ModEffects.INVINCIBLE.get(), 200));
+        player.addEffect(new MobEffectInstance(ModEffects.INVINCIBLE.get(), Macro.TIMEKEEPERS_FREEZE_OTHER_DURATION));
     }
 }

@@ -1,6 +1,7 @@
 package com.example.spdim.core.mechanic;
 
 import com.example.spdim.core.functions.Functions;
+import com.example.spdim.core.Macro;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -29,9 +30,6 @@ public class Taunt {
     private static Map<UUID, Boolean> isOn = new HashMap<>();
 		private static Map<UUID, List<UUID>> tauntEntity = new HashMap<>();
 		private static Map<UUID, List<UUID>> tauntedEntity = new HashMap<>();
-		private static final float RADIUS = 16.0F;
-		private static final float COST_PER_TICK = 0.1F;
-		private static final float CHARGE_PER_TICK = 0.025F;
     // Put the target to the hashmap.
     public static void taunt(LivingEntity summonedTaunt) {
         if (summonedTaunt == null) {
@@ -75,18 +73,15 @@ public class Taunt {
 					isOn.remove(summonedTaunt);
     			clientTaunt.remove(summonedTaunt);
     			clientIsOn.remove(summonedTaunt);
-					System.out.println("First");
 					continue;
 				}
 				Float charge = taunt.get(summonedTaunt);
 				if (charge == null) {
-					System.out.println("Second");
 					continue;
 				}
 				float currentCharge = charge.floatValue();
 				Boolean current = isOn.get(summonedTaunt);
 				if (current == null) {
-					System.out.println("Third");
 					continue;
 				}
 				boolean isTauntOn = current.booleanValue();
@@ -102,21 +97,18 @@ public class Taunt {
 					}
 				}
 				if (tag == null) {
-					System.out.println("Fourth");
 					continue;
 				}
 				if (!(tag.contains("SummonedUUID"))) {
-					System.out.println("Fifth");
 					continue;
 				}
 				boolean isLeftHandSummonItem = (tag.getUUID("SummonedUUID").equals(wolfUUID));
 				if (isTauntOn) {
-					if (currentCharge - COST_PER_TICK < 0.0F || !isLeftHandSummonItem) {
+					if (currentCharge - Macro.TAUNT_COST_PER_TICK < 0.0F || !isLeftHandSummonItem) {
 						Taunt.control(summonedTauntEntity);
-						currentCharge += CHARGE_PER_TICK;
+						currentCharge += Macro.TAUNT_CHARGE_PER_TICK;
 						taunt.put(summonedTaunt, currentCharge);
 						clientTaunt.put(summonedTaunt, currentCharge);
-						System.out.println("Sixth");
 						continue;
 					}
 					summonedTauntEntity.addEffect(new MobEffectInstance(
@@ -128,7 +120,7 @@ public class Taunt {
 					));
 	
 					Vec3 center = summonedTauntEntity.getBoundingBox().getCenter();
-					AABB box = new AABB(new Vec3(center.x - RADIUS, -64, center.z - RADIUS), new Vec3(center.x + RADIUS, 320, center.z + RADIUS));
+					AABB box = new AABB(new Vec3(center.x - Macro.TAUNT_EFFECT_RADIUS, -64, center.z - Macro.TAUNT_EFFECT_RADIUS), new Vec3(center.x + Macro.TAUNT_EFFECT_RADIUS, 320, center.z + Macro.TAUNT_EFFECT_RADIUS));
 					// Detect for living entities
 					List<LivingEntity> entities = summonedTauntEntity.level().getEntitiesOfClass(
 						LivingEntity.class,
@@ -142,7 +134,7 @@ public class Taunt {
 								return false;
 							}
 							Vec3 targetCenter = e.getBoundingBox().getCenter();
-							return ((targetCenter.x - center.x) * (targetCenter.x - center.x) + (targetCenter.z - center.z) * (targetCenter.z - center.z) <= RADIUS * RADIUS);
+							return ((targetCenter.x - center.x) * (targetCenter.x - center.x) + (targetCenter.z - center.z) * (targetCenter.z - center.z) <= Macro.TAUNT_EFFECT_RADIUS * Macro.TAUNT_EFFECT_RADIUS);
 						}
 					);
 					List<UUID> livingEntities = new ArrayList<>();
@@ -160,12 +152,12 @@ public class Taunt {
 						}
 					}
 					tauntEntity.put(summonedTaunt, livingEntities);
-					currentCharge -= COST_PER_TICK;
+					currentCharge -= Macro.TAUNT_COST_PER_TICK;
 					if (currentCharge < 0.0F) {
 						currentCharge = 0.0F;
 					}
 				} else {	
-					currentCharge += CHARGE_PER_TICK;
+					currentCharge += Macro.TAUNT_CHARGE_PER_TICK;
 					if (currentCharge > 100.0F) {
 						currentCharge = 100.0F;
 					}

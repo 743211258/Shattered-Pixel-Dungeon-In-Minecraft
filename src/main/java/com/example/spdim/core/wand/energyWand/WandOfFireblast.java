@@ -7,7 +7,8 @@ import java.util.Set;
 import com.example.spdim.core.mechanic.Invincible;
 import com.example.spdim.core.mechanic.CooldownSystem;
 import com.example.spdim.core.wand.EnergyWand;
-import com.example.spdim.ExampleMod;
+import com.example.spdim.core.Macro;
+import com.example.spdim.SPDIM;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -30,12 +31,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.util.Mth;
 
 public class WandOfFireblast extends EnergyWand {
-
-    // parameters of the fireblast
-    private final double HEIGHT = 10;
-    private final double RADIUS = 10;
-    private final double STEP_HEIGHT = 1;
-    private final double STEP_RADIUS = 1;
 
     public WandOfFireblast(Properties properties, int maxEnergy, int energyCost, int cooldown, Component name) {
         super(properties, maxEnergy, energyCost, cooldown, name);
@@ -63,10 +58,10 @@ public class WandOfFireblast extends EnergyWand {
         Vec3 right = forward.cross(worldUp).normalize();
         Vec3 up = right.cross(forward).normalize();
 
-        Vec3 pointOne = origin.add(forward.scale(HEIGHT)).add(right.scale(RADIUS));
-        Vec3 pointTwo = origin.add(forward.scale(HEIGHT)).subtract(right.scale(RADIUS));
-        Vec3 pointThree = origin.add(forward.scale(HEIGHT)).add(up.scale(RADIUS));
-        Vec3 pointFour = origin.add(forward.scale(HEIGHT)).subtract(up.scale(RADIUS));
+        Vec3 pointOne = origin.add(forward.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT)).add(right.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_RADIUS));
+        Vec3 pointTwo = origin.add(forward.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT)).subtract(right.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_RADIUS));
+        Vec3 pointThree = origin.add(forward.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT)).add(up.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_RADIUS));
+        Vec3 pointFour = origin.add(forward.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT)).subtract(up.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_RADIUS));
 
         double minX = Math.min(Math.min(Math.min(Math.min(origin.x, pointOne.x), pointTwo.x), pointThree.x), pointFour.x);
         double minY = Math.min(Math.min(Math.min(Math.min(origin.y, pointOne.y), pointTwo.y), pointThree.y), pointFour.y);
@@ -89,11 +84,11 @@ public class WandOfFireblast extends EnergyWand {
                     }
                     Vec3 vectorFromOriginToEntity = e.position().subtract(origin);
                     double projectionLength = vectorFromOriginToEntity.dot(forward);
-                    if (projectionLength <= 0 || projectionLength > HEIGHT) {
+                    if (projectionLength <= 0 || projectionLength > Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT) {
                         return false;
                     }
                     double verticalLengthFromEntityToProjectionSqr = vectorFromOriginToEntity.lengthSqr() - (projectionLength * projectionLength);
-                    double radiusAtSamePlane = projectionLength;
+                    double radiusAtSamePlane = projectionLength / Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT * Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_RADIUS;
                     return (verticalLengthFromEntityToProjectionSqr <= radiusAtSamePlane * radiusAtSamePlane);
                 }
         );
@@ -121,11 +116,11 @@ public class WandOfFireblast extends EnergyWand {
             entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 150, 3));
         }
 
-        for (double d = 0; d <= HEIGHT; d += STEP_HEIGHT) {
-            double radius = d;
+        for (double d = 0; d <= Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT; d += Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_STEP_HEIGHT) {
+            double radius = d / Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT * Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_RADIUS;
             double radiusSqr = radius * radius;
-            for (double x = -radius; x <= radius; x += STEP_RADIUS) {
-                for (double y = -radius; y <= radius; y += STEP_RADIUS) {
+            for (double x = -radius; x <= radius; x += Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_STEP_RADIUS) {
+                for (double y = -radius; y <= radius; y += Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_STEP_RADIUS) {
 
                     if (radius == 0 || x * x + y * y > radiusSqr) {
                         continue;

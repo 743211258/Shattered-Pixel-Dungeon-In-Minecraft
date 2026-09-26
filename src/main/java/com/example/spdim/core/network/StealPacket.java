@@ -1,11 +1,13 @@
 package com.example.spdim.core.network;
 
 import net.minecraft.world.item.ItemStack;
-import com.example.spdim.core.artifact.MasterThievesArmband;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 import java.util.function.Supplier;
+
+import com.example.spdim.core.artifact.MasterThievesArmband;
+import com.example.spdim.SPDIM;
 
 public class StealPacket {
 
@@ -27,6 +29,7 @@ public class StealPacket {
 			if (player == null) {
 				return;
 			}
+			SPDIM.LOGGER.debug("Received StealPacket from {}", player.getGameProfile().getName());
 			ItemStack stack = player.getOffhandItem();
 			if (!stack.isEmpty() && stack.getItem() instanceof MasterThievesArmband item && item.isApplicable(stack, player.level())) {
 				item.stealServerSide(stack, player.serverLevel(), player);

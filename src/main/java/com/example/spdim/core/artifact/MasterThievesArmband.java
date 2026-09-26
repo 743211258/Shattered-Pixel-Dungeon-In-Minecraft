@@ -18,13 +18,12 @@ import net.minecraft.world.entity.projectile.ProjectileUtil;
 import com.example.spdim.core.Artifact;
 import com.example.spdim.core.mechanic.CooldownSystem;
 import com.example.spdim.core.mechanic.Invincible;
+import com.example.spdim.core.Macro;
 import com.example.spdim.core.network.MyModNetwork;
 import com.example.spdim.core.network.StealPacket;
 
 public class MasterThievesArmband extends Artifact {
 
-	protected final int ARMBAND_COOLDOWN = 6000;
-	protected final int MAX_CONTROL_RANGE = 10;
 	protected final EquipmentSlot[] DISARM_SLOTS = {
 		EquipmentSlot.MAINHAND,
 		EquipmentSlot.OFFHAND,
@@ -52,7 +51,7 @@ public class MasterThievesArmband extends Artifact {
 			return;
 		}
 		long now = world.getGameTime();
-		CooldownSystem.createCooldownState(stack, 1, 1, ARMBAND_COOLDOWN, now);
+		CooldownSystem.createCooldownState(stack, 1, 1, Macro.MASTER_THIEVES_ARMBAND_COOLDOWN, now);
 		CooldownSystem.tryRegainAnyEnergy(stack, 1, world);
 	}
 
@@ -68,14 +67,14 @@ public class MasterThievesArmband extends Artifact {
 	public void stealServerSide(ItemStack stack, ServerLevel level, ServerPlayer player) {
 		Vec3 start = player.getEyePosition(1.0F);
 		Vec3 look = player.getLookAngle();
-		Vec3 end = start.add(look.scale(MAX_CONTROL_RANGE));
+		Vec3 end = start.add(look.scale(Macro.MASTER_THIEVES_ARMBAND_CONTROL_RANGE));
 
     EntityHitResult hitResult = ProjectileUtil.getEntityHitResult(
 			level,
 			player,
 			start,
 			end,
-			player.getBoundingBox().expandTowards(look.scale(MAX_CONTROL_RANGE)).inflate(1.0),
+			player.getBoundingBox().expandTowards(look.scale(Macro.MASTER_THIEVES_ARMBAND_CONTROL_RANGE)).inflate(1.0),
 			e -> e != player && e instanceof LivingEntity livingEntity && !Invincible.isInvincible(livingEntity)
 		);
 		if (hitResult != null && hitResult.getEntity() instanceof LivingEntity livingEntity) {

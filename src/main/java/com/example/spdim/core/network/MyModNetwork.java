@@ -5,19 +5,20 @@ import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraft.resources.ResourceLocation;
 
+import com.example.spdim.core.Macro;
+
 import java.util.Optional;
 
 public class MyModNetwork {
-    private static final String PROTOCOL_VERSION = "1";
     public static SimpleChannel CHANNEL;
 
     // Register all customized network packets.
     public static void register() {
         CHANNEL = NetworkRegistry.ChannelBuilder
                 .named(ResourceLocation.fromNamespaceAndPath("spdim", "main"))
-                .networkProtocolVersion(() -> PROTOCOL_VERSION)
-                .clientAcceptedVersions(PROTOCOL_VERSION::equals)
-                .serverAcceptedVersions(PROTOCOL_VERSION::equals)
+                .networkProtocolVersion(() -> Macro.MYMODNETWORK_PROTOCOL_VERSION)
+                .clientAcceptedVersions(Macro.MYMODNETWORK_PROTOCOL_VERSION::equals)
+                .serverAcceptedVersions(Macro.MYMODNETWORK_PROTOCOL_VERSION::equals)
                 .simpleChannel();
 
         int id = 0;
