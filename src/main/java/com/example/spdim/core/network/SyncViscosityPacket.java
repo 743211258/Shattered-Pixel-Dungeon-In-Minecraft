@@ -2,8 +2,7 @@
 
 package com.example.spdim.core.network;
 
-import com.example.spdim.core.data_structure.ViscosityRender;
-import com.example.spdim.core.data_structure.ViscosityTotalDamageRender;
+import com.example.spdim.core.data_structure.ViscosityRenderData;
 import com.example.spdim.core.mechanic.MixinReference;
 
 import net.minecraft.network.FriendlyByteBuf;
@@ -16,12 +15,12 @@ import java.util.function.Supplier;
 
 public class SyncViscosityPacket {
 
-    private final Map<UUID, ViscosityRender> renderReference;
-    private final Map<UUID, ViscosityTotalDamageRender> totalDamageReference;
+    private final Map<UUID, ViscosityRenderData> renderReference;
+    private final Map<UUID, ViscosityRenderData> totalDamageReference;
 
     public SyncViscosityPacket(
-            Map<UUID, ViscosityRender> renderReference,
-            Map<UUID, ViscosityTotalDamageRender> totalDamageReference) {
+            Map<UUID, ViscosityRenderData> renderReference,
+            Map<UUID, ViscosityRenderData> totalDamageReference) {
 
         this.renderReference = new HashMap<>(renderReference);
         this.totalDamageReference = new HashMap<>(totalDamageReference);
@@ -35,7 +34,7 @@ public class SyncViscosityPacket {
 
             buf.writeUUID(e.getKey());
 
-            ViscosityRender r = e.getValue();
+            ViscosityRenderData r = e.getValue();
 
             buf.writeFloat(r.healthMin);
             buf.writeFloat(r.healthMax);
@@ -49,7 +48,7 @@ public class SyncViscosityPacket {
 
             buf.writeUUID(e.getKey());
 
-            ViscosityTotalDamageRender r = e.getValue();
+            ViscosityRenderData r = e.getValue();
 
             buf.writeFloat(r.healthMin);
             buf.writeFloat(r.healthMax);
@@ -60,7 +59,7 @@ public class SyncViscosityPacket {
 
     public static SyncViscosityPacket decode(FriendlyByteBuf buf) {
 
-        Map<UUID, ViscosityRender> render = new HashMap<>();
+        Map<UUID, ViscosityRenderData> render = new HashMap<>();
 
         int size = buf.readInt();
 
@@ -69,14 +68,14 @@ public class SyncViscosityPacket {
             UUID uuid = buf.readUUID();
 
             render.put(uuid,
-                    new ViscosityRender(
+                    new ViscosityRenderData(
                             buf.readFloat(),
                             buf.readFloat(),
                             buf.readFloat(),
                             buf.readFloat()));
         }
 
-        Map<UUID, ViscosityTotalDamageRender> total = new HashMap<>();
+        Map<UUID, ViscosityRenderData> total = new HashMap<>();
 
         size = buf.readInt();
 
@@ -85,7 +84,7 @@ public class SyncViscosityPacket {
             UUID uuid = buf.readUUID();
 
             total.put(uuid,
-                    new ViscosityTotalDamageRender(
+                    new ViscosityRenderData(
                             buf.readFloat(),
                             buf.readFloat(),
                             buf.readFloat(),

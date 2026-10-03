@@ -10,6 +10,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 
 import com.example.spdim.core.interfaces.EnergyBased;
 import com.example.spdim.core.mechanic.CooldownSystem;
@@ -65,5 +66,5 @@ public abstract class EnergyWand extends Wand implements EnergyBased{
         CooldownSystem.tryRegainAnyEnergy(stack, 1, world);
     }
 
-    protected abstract void cast(Level world, Player player, ItemStack stack);
+    protected abstract void cast(ServerLevel world, Player player, ItemStack stack);
 }

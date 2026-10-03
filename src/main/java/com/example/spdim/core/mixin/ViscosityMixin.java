@@ -17,8 +17,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
-import com.example.spdim.core.data_structure.ViscosityRender;
-import com.example.spdim.core.data_structure.ViscosityTotalDamageRender;
+import com.example.spdim.core.data_structure.ViscosityRenderData;
 import com.example.spdim.core.mechanic.MixinReference;
 
 import java.util.UUID;
@@ -63,8 +62,8 @@ public class ViscosityMixin {
 			return;	
 		}
 		UUID uuid = player.getUUID();
-		ViscosityRender reference = MixinReference.renderReference.get(uuid);
-		ViscosityTotalDamageRender totalDamageReference = MixinReference.totalDamageRenderReference.get(uuid);
+		ViscosityRenderData reference = MixinReference.renderReference.get(uuid);
+		ViscosityRenderData totalDamageReference = MixinReference.totalDamageRenderReference.get(uuid);
 		if (reference == null) {
 			original.call(
 				instance,

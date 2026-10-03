@@ -9,6 +9,7 @@ import com.example.spdim.core.mechanic.Freeze;
 import com.example.spdim.core.mechanic.Invincible;
 import com.example.spdim.core.mechanic.RegenerationDisabled;
 import com.example.spdim.core.mechanic.ViscosityEffect;
+import com.example.spdim.core.mechanic.Rooted;
 
 public class ModEffects {
 	public static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, "spdim");
@@ -17,5 +18,5 @@ public class ModEffects {
 	public static final RegistryObject<MobEffect> VISCOSITY_EFFECT = EFFECTS.register("viscosity", () -> new ViscosityEffect());
 	public static final RegistryObject<MobEffect> INVINCIBLE = EFFECTS.register("invincible", () -> new Invincible());
 	public static final RegistryObject<MobEffect> REGEN_DISABLED = EFFECTS.register("regen_disabled", () -> new RegenerationDisabled());
-
+	public static final RegistryObject<MobEffect> ROOTED = EFFECTS.register("rooted", () -> new Rooted());
 }

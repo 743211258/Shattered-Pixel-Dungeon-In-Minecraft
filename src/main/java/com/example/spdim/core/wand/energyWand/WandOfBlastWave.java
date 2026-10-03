@@ -12,40 +12,39 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.server.level.ServerLevel;
 
 
 public class WandOfBlastWave extends EnergyWand{
 
-    public WandOfBlastWave(Properties properties, int maxEnergy, int energyCost, int cooldown, Component name) {
-        super(properties, maxEnergy, energyCost, cooldown, name);
-    }
+	public WandOfBlastWave(Properties properties, int maxEnergy, int energyCost, int cooldown, Component name) {
+		super(properties, maxEnergy, energyCost, cooldown, name);
+	}
 
-    @Override
-    protected void cast(Level world, Player player, ItemStack stack) {
-        if (!world.isClientSide) {
-            // Cast happens only if the wand is charged
-            if (CooldownSystem.hasPositiveEnergy(stack)) {
-                // Generate a blast wave entity at eye level
-                BlastWave wave = new BlastWave(SPDIM.BLAST_WAVE.get(), world);
+	@Override
+	protected void cast(ServerLevel world, Player player, ItemStack stack) {
+		// Cast happens only if the wand is charged
+		if (CooldownSystem.hasPositiveEnergy(stack)) {
+			// Generate a blast wave entity at eye level
+			BlastWave wave = new BlastWave(SPDIM.BLAST_WAVE.get(), world);
 
-                // Set the initial position, direction, and explosion radius
-                Vec3 spawnPos = player.getEyePosition(1.0F);
-                wave.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
-                wave.setExplodeRadius(Macro.WAND_OF_BLAST_WAVE_EXPLODE_RADIUS);
+			// Set the initial position, direction, and explosion radius
+			Vec3 spawnPos = player.getEyePosition(1.0F);
+			wave.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
+			wave.setExplodeRadius(Macro.WAND_OF_BLAST_WAVE_EXPLODE_RADIUS);
 
-                // Set the owner for mob AI (Mobs will attack the caster)
-                wave.setOwner(player);
+			// Set the owner for mob AI (Mobs will attack the caster)
+			wave.setOwner(player);
 
-                // Set the speed
-                wave.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, Macro.WAND_OF_BLAST_WAVE_SPEED, 0.0F);
-                wave.hasImpulse = true;
+			// Set the speed
+			wave.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, Macro.WAND_OF_BLAST_WAVE_SPEED, 0.0F);
+			wave.hasImpulse = true;
 
-                // Add the wave to the player's world
-                world.addFreshEntity(wave);
+			// Add the wave to the player's world
+			world.addFreshEntity(wave);
 
-                // Additional condition to prevent bugs.
-                CooldownSystem.consumeAnyEnergy(stack, 1, world);
-            }
-        }
-    }
+			// Additional condition to prevent bugs.
+			CooldownSystem.consumeAnyEnergy(stack, 1, world);
+		}
+	}
 }

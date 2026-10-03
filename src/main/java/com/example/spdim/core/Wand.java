@@ -6,6 +6,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 
 // Wand class
 public abstract class Wand extends Item {
@@ -16,10 +17,10 @@ public abstract class Wand extends Item {
 
     // Right click is the default way of using wands.
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
-        if (!level.isClientSide) {
+        if (world instanceof ServerLevel level) {
             cast(level, player, stack);
         }
 
@@ -27,5 +28,5 @@ public abstract class Wand extends Item {
     }
 
     // Wand interacts with the environment.
-    protected abstract void cast(Level world, Player player, ItemStack stack);
+    protected abstract void cast(ServerLevel world, Player player, ItemStack stack);
 }

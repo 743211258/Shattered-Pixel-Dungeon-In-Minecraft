@@ -1,6 +1,5 @@
 package com.example.spdim.core.event;
 
-import com.example.spdim.core.mechanic.Rooted;
 import com.example.spdim.core.mechanic.TargetLock;
 import com.example.spdim.core.mechanic.Summon;
 import com.example.spdim.core.mechanic.Taunt;
@@ -34,8 +33,7 @@ public class ServerEvents {
             return;
         }
         MinecraftServer server = event.getServer();
-        Rooted.tick();
-				TargetLock.tick();
+				TargetLock.tick(server);
 				Summon.tick();
         Taunt.tick(server);
 				SyncViscosityPacket packet =

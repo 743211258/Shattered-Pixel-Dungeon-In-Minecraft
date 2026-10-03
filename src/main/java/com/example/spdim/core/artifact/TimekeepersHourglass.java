@@ -73,7 +73,7 @@ public class TimekeepersHourglass extends Artifact {
                 e -> e instanceof LivingEntity && e != player
         );
         if (entityHit != null && entityHit.getEntity() instanceof LivingEntity target && !Invincible.isInvincible(target)) {
-            target.addEffect(new MobEffectInstance(ModEffects.FREEZE.get(), Macro.TIMEKEEPERS_FREEZE_SELF_DURATION));
+            target.addEffect(new MobEffectInstance(ModEffects.FREEZE.get(), Macro.TIMEKEEPERS_FREEZE_OTHER_DURATION));
         } else {
             return;
         }
@@ -94,6 +94,6 @@ public class TimekeepersHourglass extends Artifact {
         }
         CooldownSystem.consumeAnyEnergy(stack, 1, serverLevel);
         player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 200, 0, false, false)); 
-        player.addEffect(new MobEffectInstance(ModEffects.INVINCIBLE.get(), Macro.TIMEKEEPERS_FREEZE_OTHER_DURATION));
+        player.addEffect(new MobEffectInstance(ModEffects.INVINCIBLE.get(), Macro.TIMEKEEPERS_FREEZE_SELF_DURATION));
     }
 }

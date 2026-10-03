@@ -37,7 +37,7 @@ public class WandOfFireblast extends EnergyWand {
     }
 
     @Override
-    protected void cast(Level world, Player player, ItemStack stack) {
+    protected void cast(ServerLevel world, Player player, ItemStack stack) {
         // Only execute at server side.
         if (world.isClientSide) {
             return;
