@@ -33,24 +33,20 @@ public class ServerEvents {
 			return;
 		}
 		MinecraftServer server = event.getServer();
-				TargetLock.tick(server);
-				Summon.tick();
+		TargetLock.tick(server);
+		Summon.tick();
 		Taunt.tick(server);
-				SyncViscosityPacket packet =
-								new SyncViscosityPacket(
-												MixinReference.renderReference,
-												MixinReference.totalDamageRenderReference);
+		SyncViscosityPacket packet =
+			new SyncViscosityPacket(
+				MixinReference.renderReference,
+				MixinReference.totalDamageRenderReference);
 
-				for (ServerPlayer player :
-								ServerLifecycleHooks.getCurrentServer()
-												.getPlayerList()
-												.getPlayers()) {
-
-						MyModNetwork.CHANNEL.send(
-										PacketDistributor.PLAYER.with(() -> player),
-										packet
-						);
-				}
+		for (ServerPlayer player : ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers()) {
+			MyModNetwork.CHANNEL.send(
+				PacketDistributor.PLAYER.with(() -> player),
+				packet
+			);
+		}
 	}
 	@SubscribeEvent
 	public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {

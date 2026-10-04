@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.example.spdim.core.mechanic.Invincible;
 import com.example.spdim.core.Macro;
+import com.example.spdim.core.network.MyModNetwork;
+import com.example.spdim.core.network.BlastWaveSyncPacket;
 
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -27,6 +29,8 @@ import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import net.minecraft.world.phys.*;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+
+import net.minecraftforge.network.PacketDistributor;
 
 public class BlastWave extends ThrowableProjectile implements ItemSupplier{
 
@@ -180,7 +184,7 @@ public class BlastWave extends ThrowableProjectile implements ItemSupplier{
                 radius = 0.0001;
             }
             double factor = Math.max(0, 1.0 - ((radius / explodeRadius) * (radius / explodeRadius)));
-            Vec3 pushForce = direction.normalize().scale((float) ((5.0D - Macro.BLAST_WAVE_KNOCKBACK_MULTIPLIER * magnitude) * factor));
+            Vec3 pushForce = direction.normalize().scale((float) ((10.0D - Macro.BLAST_WAVE_KNOCKBACK_MULTIPLIER * magnitude) * factor));
             if (isBlockedByBlock(pos, entity)) {
                 pushForce = pushForce.scale(0.2);
             }
@@ -188,9 +192,11 @@ public class BlastWave extends ThrowableProjectile implements ItemSupplier{
                 if (isBlockedByShield(this, sp)) {
                     pushForce = pushForce.scale(0.33);
                 }
-                sp.push(pushForce.x, pushForce.y, pushForce.z); // 强制推动
-                sp.connection.send(new ClientboundSetEntityMotionPacket(sp)); // 同步客户端
-                continue;
+                sp.push(pushForce.x, pushForce.y, pushForce.z);
+                MyModNetwork.CHANNEL.send(
+                    PacketDistributor.PLAYER.with(() -> sp),
+                    new BlastWaveSyncPacket(sp.getDeltaMovement())
+                );
             } else {
                 entity.setDeltaMovement(entity.getDeltaMovement().add(pushForce));
             }

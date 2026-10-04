@@ -79,7 +79,12 @@ public class MyModNetwork {
                 SyncViscosityPacket::decode,
                 SyncViscosityPacket::handle,
                 Optional.of(NetworkDirection.PLAY_TO_CLIENT)
-        ); 
+        );
+        CHANNEL.registerMessage(id++, BlastWaveSyncPacket.class,
+                BlastWaveSyncPacket::encode,
+                BlastWaveSyncPacket::decode,
+                BlastWaveSyncPacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT)
+        );  
     }
 }
-
