@@ -12,6 +12,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -26,16 +27,16 @@ import com.example.spdim.core.network.SyncViscosityPacket;
 @Mod.EventBusSubscriber(modid = "spdim", bus = Mod.EventBusSubscriber.Bus.FORGE)
 
 public class ServerEvents {
-    // Run all tick function for every tick.
-    @SubscribeEvent
-    public static void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) {
-            return;
-        }
-        MinecraftServer server = event.getServer();
+	// Run all tick function for every tick.
+	@SubscribeEvent
+	public static void onServerTick(TickEvent.ServerTickEvent event) {
+		if (event.phase != TickEvent.Phase.END) {
+			return;
+		}
+		MinecraftServer server = event.getServer();
 				TargetLock.tick(server);
 				Summon.tick();
-        Taunt.tick(server);
+		Taunt.tick(server);
 				SyncViscosityPacket packet =
 								new SyncViscosityPacket(
 												MixinReference.renderReference,
@@ -51,36 +52,58 @@ public class ServerEvents {
 										packet
 						);
 				}
-    }
-    @SubscribeEvent
-    public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        Player player = event.getEntity();
-        if (player.level().isClientSide()) {
-            return;
-        }
-        CompoundTag data = player.getPersistentData();
+	}
+	@SubscribeEvent
+	public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
+		Player player = event.getEntity();
+		if (player.level().isClientSide()) {
+			return;
+		}
+		CompoundTag data = player.getPersistentData();
 
-        if (data.getBoolean("hasEncyclopedia")) {
-            return;
-        } else {
-            data.putBoolean("hasEncyclopedia", true);
-        }
-        ItemStack book = new ItemStack(Items.WRITTEN_BOOK);
-        CompoundTag tag = book.getOrCreateTag();
-        tag.putString("title", "Encyclopedia");
-        tag.putString("author", "spdim");
-        player.getInventory().add(book);
-    }
+		if (data.getBoolean("hasEncyclopedia")) {
+			return;
+		} else {
+			data.putBoolean("hasEncyclopedia", true);
+		}
+		ItemStack book = new ItemStack(Items.WRITTEN_BOOK);
+		CompoundTag tag = book.getOrCreateTag();
+		tag.putString("title", "Encyclopedia");
+		tag.putString("author", "spdim");
+		player.getInventory().add(book);
+	}
 
-    @SubscribeEvent
-    public static void onPlayerClone(PlayerEvent.Clone event) {
-        if (!event.isWasDeath()) {
-            return;
-        }
+	@SubscribeEvent
+	public static void onPlayerClone(PlayerEvent.Clone event) {
+		if (!event.isWasDeath()) {
+			return;
+		}
 
-        CompoundTag data = event.getEntity().getPersistentData();
+		CompoundTag data = event.getEntity().getPersistentData();
 				MixinReference.renderReference.remove(event.getEntity().getUUID());
-        data.remove("totalDamage");
-        data.remove("ViscosityTick");
-    }
+		data.remove("totalDamage");
+		data.remove("ViscosityTick");
+	}
+	@SubscribeEvent
+	public static void onLivingTick(LivingEvent.LivingTickEvent event) {
+		if (!(event.getEntity() instanceof ServerPlayer player)) {
+			return;
+		}
+
+		Vec3 velocity = player.getDeltaMovement();
+
+		if (velocity.lengthSqr() > 1e-8) {
+			System.out.printf(
+				"TICK %d  POS=(%.4f, %.4f, %.4f)  DELTA=(%.4f, %.4f, %.4f)  ONGROUND=%s%n",
+				player.tickCount,
+				player.getX(),
+				player.getY(),
+				player.getZ(),
+				velocity.x,
+				velocity.y,
+				velocity.z,
+				player.onGround()
+			);
+		}
+	}
 }

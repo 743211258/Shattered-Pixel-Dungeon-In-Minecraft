@@ -179,14 +179,11 @@ public class BlastWave extends ThrowableProjectile implements ItemSupplier{
                 direction = new Vec3(0, 1, 0);
                 radius = 0.0001;
             }
-
-
             double factor = Math.max(0, 1.0 - ((radius / explodeRadius) * (radius / explodeRadius)));
-            Vec3 pushForce = direction.normalize().scale((float) ((10.0D - Macro.BLAST_WAVE_KNOCKBACK_MULTIPLIER * magnitude) * factor));
+            Vec3 pushForce = direction.normalize().scale((float) ((5.0D - Macro.BLAST_WAVE_KNOCKBACK_MULTIPLIER * magnitude) * factor));
             if (isBlockedByBlock(pos, entity)) {
                 pushForce = pushForce.scale(0.2);
             }
-
             if (entity instanceof ServerPlayer sp) {
                 if (isBlockedByShield(this, sp)) {
                     pushForce = pushForce.scale(0.33);

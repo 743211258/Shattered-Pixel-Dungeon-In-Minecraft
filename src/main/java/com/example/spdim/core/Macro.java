@@ -9,7 +9,7 @@ public class Macro {
 
 	public static final float BLAST_WAVE_DAMAGE_MULTIPLIER = 1.0F;
 
-	public static final float BLAST_WAVE_KNOCKBACK_MULTIPLIER = 0.2F;
+	public static final float BLAST_WAVE_KNOCKBACK_MULTIPLIER = 0.1F;
 	
 	public static final int CHALICE_OF_BLOOD_ABSORPTION_EFFECT_DURATION = 3600;
 
