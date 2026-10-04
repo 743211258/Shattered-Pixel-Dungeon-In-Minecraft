@@ -12,7 +12,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -83,27 +82,5 @@ public class ServerEvents {
 				MixinReference.renderReference.remove(event.getEntity().getUUID());
 		data.remove("totalDamage");
 		data.remove("ViscosityTick");
-	}
-	@SubscribeEvent
-	public static void onLivingTick(LivingEvent.LivingTickEvent event) {
-		if (!(event.getEntity() instanceof ServerPlayer player)) {
-			return;
-		}
-
-		Vec3 velocity = player.getDeltaMovement();
-
-		if (velocity.lengthSqr() > 1e-8) {
-			System.out.printf(
-				"TICK %d  POS=(%.4f, %.4f, %.4f)  DELTA=(%.4f, %.4f, %.4f)  ONGROUND=%s%n",
-				player.tickCount,
-				player.getX(),
-				player.getY(),
-				player.getZ(),
-				velocity.x,
-				velocity.y,
-				velocity.z,
-				player.onGround()
-			);
-		}
 	}
 }
