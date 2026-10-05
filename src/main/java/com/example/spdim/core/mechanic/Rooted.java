@@ -20,6 +20,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class Rooted extends MobEffect {
@@ -60,10 +61,11 @@ public class Rooted extends MobEffect {
 
 		ServerLevel overworld = server.overworld();
 
+		MapSavedData<UUID, Vec3> data = getSavedData(overworld);
+
 		if (livingEntity instanceof Mob mob) {
 			if (!LOCKED.containsKey(uuid)) {
 				LOCKED.put(uuid, mob.position());
-				MapSavedData<UUID, Vec3> data = getSavedData(overworld);
 				data.setDirty();
 			}
 			Vec3 lp = LOCKED.get(uuid);
@@ -75,7 +77,6 @@ public class Rooted extends MobEffect {
 		} else if (livingEntity instanceof Player player) {
 			if (!LOCKED.containsKey(uuid)) {
 				LOCKED.put(uuid, player.position());
-				MapSavedData<UUID, Vec3> data = getSavedData(overworld);
 				data.setDirty();
 			}
 			Vec3 lp = LOCKED.get(uuid);
@@ -103,23 +104,31 @@ public class Rooted extends MobEffect {
 		ServerLevel overworld = server.overworld();
 
 		MapSavedData<UUID, Vec3> data = getSavedData(overworld);
-		delete(livingEntity);
+		delete(livingEntity, overworld);
 		if (livingEntity instanceof Mob mob) {
 			mob.setDeltaMovement(mob.getDeltaMovement());
 			mob.hurtMarked = true;
-		}	
+		}
 		LOCKED.remove(livingEntity.getUUID());
 		data.setDirty();
 	}
 
-	private static void delete(LivingEntity entity) {
-		// Remove all blocks that surround the player.
-		if (WandOfRegrowth.BLOCKS.containsKey(entity)) {
-			for (BlockPos pos : WandOfRegrowth.BLOCKS.get(entity)) {
-				entity.level().destroyBlock(pos, false);
-			}
+	private static void delete(LivingEntity entity, ServerLevel level) {
+		MapSavedData<UUID, Set<BlockPos>> blocksData = WandOfRegrowth.getSavedData(level);
+
+		Set<BlockPos> blocks =
+			WandOfRegrowth.BLOCKS.remove(entity.getUUID());
+
+		if (blocks == null) {
+			return;
 		}
+
+		for (BlockPos pos : blocks) {
+			entity.level().destroyBlock(pos, false);
+		}
+		blocksData.setDirty();
 	}
+
 	public static boolean isRooted(LivingEntity entity) {
 		return entity.hasEffect(ModEffects.ROOTED.get());
 	}

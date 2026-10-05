@@ -147,6 +147,8 @@ public class Freeze extends MobEffect {
 
 		ServerLevel overworld = server.overworld();
 
+		MapSavedData<UUID, PosAndDirection> data = Freeze.getSavedData(overworld);
+
 		if (livingEntity instanceof Mob mob) {
 			mob.setNoAi(false);
 			mob.getNavigation().recomputePath();
@@ -154,7 +156,6 @@ public class Freeze extends MobEffect {
 			mob.hurtMarked = true;
 		}	
 		LIVING_ENTITY_POSITION.remove(livingEntity.getUUID());
-		MapSavedData<UUID, PosAndDirection> data = Freeze.getSavedData(overworld);
 		data.setDirty();
 	}
 

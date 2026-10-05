@@ -36,8 +36,8 @@ public class Taunt {
 	private static Map<UUID, Boolean> clientIsOn = new HashMap<>();
 	private static Map<UUID, Float> taunt = new HashMap<>();
 	private static Map<UUID, Boolean> isOn = new HashMap<>();
-		private static Map<UUID, List<UUID>> tauntEntity = new HashMap<>();
-		private static Map<UUID, List<UUID>> tauntedEntity = new HashMap<>();
+	private static Map<UUID, List<UUID>> tauntEntity = new HashMap<>();
+	private static Map<UUID, List<UUID>> tauntedEntity = new HashMap<>();
 	// Put the target to the hashmap.
 	public static void taunt(LivingEntity summonedTaunt) {
 		if (summonedTaunt == null) {

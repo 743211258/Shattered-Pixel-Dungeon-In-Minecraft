@@ -1,11 +1,14 @@
 package com.example.spdim.core.wand.energyWand;
 
 import com.example.spdim.SPDIM;
+import com.example.spdim.core.codec.BlockPosSetCodec;
+import com.example.spdim.core.codec.UUIDCodec;
 import com.example.spdim.core.MapSavedData;
 import com.example.spdim.core.mechanic.Invincible;
 import com.example.spdim.core.mechanic.Rooted;
 import com.example.spdim.core.mechanic.CooldownSystem;
 import com.example.spdim.core.Macro;
+import com.example.spdim.core.MapSavedData;
 import com.example.spdim.core.wand.EnergyWand;
 
 import net.minecraft.core.BlockPos;
@@ -30,10 +33,26 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
 
-
 public class WandOfRegrowth extends EnergyWand {
 
-	public static final Map<LivingEntity, Set<BlockPos>> BLOCKS = new HashMap<>();
+	public static final Map<UUID, Set<BlockPos>> BLOCKS = new HashMap<>();
+	
+	public static MapSavedData<UUID, Set<BlockPos>> getSavedData(ServerLevel level) {
+		return level.getDataStorage().computeIfAbsent(
+			tag -> MapSavedData.load(
+				tag,
+				BLOCKS,
+				new UUIDCodec(),
+				new BlockPosSetCodec()
+			),
+			() -> new MapSavedData<>(
+				BLOCKS,
+				new UUIDCodec(),
+				new BlockPosSetCodec()
+			),
+			"spdim_blocks"
+		);
+	}
 
 	public WandOfRegrowth(Properties properties, int maxEnergy, int energyCost, int cooldown, Component name) {
 		super(properties, maxEnergy, energyCost, cooldown, name);
@@ -44,6 +63,14 @@ public class WandOfRegrowth extends EnergyWand {
 		if (!CooldownSystem.hasPositiveEnergy(stack)) {
 			return;
 		}
+
+		MinecraftServer server = world.getServer();
+
+		ServerLevel overworld = server.overworld();
+
+		MapSavedData<UUID, Set<BlockPos>> blocksData = getSavedData(overworld);
+		MapSavedData<UUID, Vec3> data = Rooted.getSavedData(overworld);
+	
 		Vec3 origin = player.getEyePosition(1.0F);
 
 		// Build a Lookat matrix
@@ -74,8 +101,10 @@ public class WandOfRegrowth extends EnergyWand {
 				LivingEntity.class,
 				collision_box,
 				e -> {
-					if (e == player ||
-							Invincible.isInvincible(e)) {
+					if (e == player || 
+						!e.isAlive() || 
+						e.isRemoved() || 
+						Invincible.isInvincible(e)) {
 						return false;
 					}
 					Vec3 vectorFromOriginToEntity = e.position().subtract(origin);
@@ -103,11 +132,10 @@ public class WandOfRegrowth extends EnergyWand {
 					for (int z = blockMinZ; z <= blockMaxZ; z++) {
 
 						Set<BlockPos> set = WandOfRegrowth.BLOCKS.computeIfAbsent(
-								entity, k -> new HashSet<>()
+								entity.getUUID(), k -> new HashSet<>()
 						);
 
 						BlockPos woodPos = new BlockPos(x, y, z);
-
 
 						world.destroyBlock(woodPos, false);
 						world.setBlock(woodPos, Blocks.OAK_WOOD.defaultBlockState(), 11);
@@ -118,12 +146,8 @@ public class WandOfRegrowth extends EnergyWand {
 			}
 			Rooted.LOCKED.put(entity.getUUID(), entity.position());
 		}
-		MinecraftServer server = world.getServer();
-
-		ServerLevel overworld = server.overworld();
-
-		MapSavedData<UUID, Vec3> data = Rooted.getSavedData(overworld);
 		data.setDirty();
+		blocksData.setDirty();
 
 		for (double d = 0; d <= Macro.WAND_OF_REGROWTH_CONE_RANGE_HEIGHT; d += Macro.WAND_OF_REGROWTH_CONE_RANGE_STEP_HEIGHT) {
 			double radius = d / Macro.WAND_OF_REGROWTH_CONE_RANGE_HEIGHT * Macro.WAND_OF_REGROWTH_CONE_RANGE_RADIUS;

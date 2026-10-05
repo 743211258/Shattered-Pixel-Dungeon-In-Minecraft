@@ -34,7 +34,7 @@ public class ServerEvents {
 		}
 		MinecraftServer server = event.getServer();
 		TargetLock.tick(server);
-		Summon.tick();
+		Summon.tick(server);
 		Taunt.tick(server);
 		SyncViscosityPacket packet =
 			new SyncViscosityPacket(
