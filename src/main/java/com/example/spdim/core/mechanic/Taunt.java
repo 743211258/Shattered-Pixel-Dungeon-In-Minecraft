@@ -8,6 +8,8 @@ import com.example.spdim.core.codec.FloatCodec;
 import com.example.spdim.core.codec.IntegerCodec;
 import com.example.spdim.core.codec.UUIDCodec;
 import com.example.spdim.core.codec.UUIDListCodec;
+import com.example.spdim.core.network.MyModNetwork;
+import com.example.spdim.core.network.SyncTauntPacket;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
@@ -22,6 +24,8 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+
+import net.minecraftforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -346,6 +350,39 @@ public class Taunt {
 			clientIsOnData.setDirty();
 	}
 
+	public static void syncAll(MinecraftServer server) {
+		for (Map.Entry<UUID, Float> entry : taunt.entrySet()) {
+			UUID summonedUUID = entry.getKey();
+
+			LivingEntity entity = Functions.findLivingEntity(server, summonedUUID);
+			if (!(entity instanceof Wolf wolf) || !wolf.isAlive()) {
+				continue;
+			}
+
+			UUID ownerUUID = wolf.getOwnerUUID();
+			if (ownerUUID == null) {
+				continue;
+			}
+
+			ServerPlayer owner = server.getPlayerList().getPlayer(ownerUUID);
+			if (owner == null) {
+				continue;
+			}
+
+			Float charge = taunt.get(summonedUUID);
+			Boolean enabled = isOn.get(summonedUUID);
+
+			if (charge == null || enabled == null) {
+				continue;
+			}
+
+			MyModNetwork.CHANNEL.send(
+				PacketDistributor.PLAYER.with(() -> owner),
+				new SyncTauntPacket(summonedUUID, charge, enabled)
+			);
+		}
+	}
+
 	public static boolean canAttack(Entity attacker, Entity defender) {
 	  if (attacker instanceof LivingEntity attackLivingEntity && defender instanceof LivingEntity defendLivingEntity) {
 		if (!tauntedEntity.containsKey(attackLivingEntity.getUUID())) {
@@ -370,5 +407,13 @@ public class Taunt {
 			return false;
 		}
 		return isTauntOn.booleanValue();
+	}
+
+	public static void setTaunt(UUID summonedUUID, float value) {
+		clientTaunt.put(summonedUUID, value);
+	}
+
+	public static void setIsOn(UUID summonedUUID, boolean value) {
+		clientIsOn.put(summonedUUID, value);
 	}
 }

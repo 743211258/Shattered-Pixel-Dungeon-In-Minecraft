@@ -36,6 +36,7 @@ public class ServerEvents {
 		TargetLock.tick(server);
 		Summon.tick(server);
 		Taunt.tick(server);
+ 		Taunt.syncAll(server);
 		SyncViscosityPacket packet =
 			new SyncViscosityPacket(
 				MixinReference.renderReference,

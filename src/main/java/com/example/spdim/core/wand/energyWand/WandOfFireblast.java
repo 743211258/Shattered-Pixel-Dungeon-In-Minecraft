@@ -93,29 +93,6 @@ public class WandOfFireblast extends EnergyWand {
                 }
         );
 
-        for (LivingEntity entity : entities) {
-
-            AABB boxTwo = entity.getBoundingBox();
-            int blockMinX = Mth.floor(boxTwo.minX);
-            int blockMinY = Mth.floor(boxTwo.minY);
-            int blockMinZ = Mth.floor(boxTwo.minZ);
-            int blockMaxX = Mth.floor(boxTwo.maxX);
-            int blockMaxY = Mth.floor(boxTwo.maxY);
-            int blockMaxZ = Mth.floor(boxTwo.maxZ);
-            for (int x = blockMinX; x <= blockMaxX; x++) {
-                for (int y = blockMinY; y <= blockMaxY; y++) {
-                    for (int z = blockMinZ; z <= blockMaxZ; z++) {
-
-                        BlockPos lavaPos = new BlockPos(x, y, z);
-
-                        world.destroyBlock(lavaPos, false);
-                        world.setBlock(lavaPos, Blocks.LAVA.defaultBlockState(), 11);
-                    }
-                }
-            }
-            entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 150, 3));
-        }
-
         for (double d = 0; d <= Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT; d += Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_STEP_HEIGHT) {
             double radius = d / Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT * Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_RADIUS;
             double radiusSqr = radius * radius;

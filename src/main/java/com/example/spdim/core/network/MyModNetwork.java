@@ -80,6 +80,12 @@ public class MyModNetwork {
                 SyncViscosityPacket::handle,
                 Optional.of(NetworkDirection.PLAY_TO_CLIENT)
         );
+        CHANNEL.registerMessage(id++, SyncTauntPacket.class,
+                SyncTauntPacket::encode,
+                SyncTauntPacket::decode,
+                SyncTauntPacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT)
+        );
         CHANNEL.registerMessage(id++, BlastWaveSyncPacket.class,
                 BlastWaveSyncPacket::encode,
                 BlastWaveSyncPacket::decode,
