@@ -198,7 +198,6 @@ public class Taunt {
 	}
 
 	public static void tick(MinecraftServer server) {
-			Iterator<Map.Entry<UUID, Float>> iterator = taunt.entrySet().iterator();
 			/*Iterator<Map.Entry<UUID, List<UUID>>> tempIterator = tauntedEntity.entrySet().iterator();
 			while (tempIterator.hasNext()) {
 				Map.Entry<UUID, List<UUID>> entry = tempIterator.next();
@@ -217,6 +216,7 @@ public class Taunt {
 			MapSavedData<UUID, Float> clientTauntData = getClientTauntSavedData(overworld);
 			MapSavedData<UUID, Boolean> clientIsOnData = getClientIsOnSavedData(overworld);
 
+			Iterator<Map.Entry<UUID, Float>> iterator = taunt.entrySet().iterator();
 			while (iterator.hasNext()) {
 				Map.Entry<UUID, Float> entry = iterator.next();
 				UUID summonedTaunt = entry.getKey();
