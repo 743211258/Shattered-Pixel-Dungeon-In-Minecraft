@@ -10,6 +10,8 @@ import com.example.spdim.core.mechanic.CooldownSystem;
 import com.example.spdim.core.Macro;
 import com.example.spdim.core.MapSavedData;
 import com.example.spdim.core.wand.EnergyWand;
+import com.example.spdim.core.network.MyModNetwork;
+import com.example.spdim.core.network.MagicParticlePacket;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -30,6 +32,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+
+import net.minecraftforge.network.PacketDistributor;
 
 import java.util.*;
 
@@ -148,60 +152,11 @@ public class WandOfRegrowth extends EnergyWand {
 		}
 		data.setDirty();
 		blocksData.setDirty();
-
-		for (double d = 0; d <= Macro.WAND_OF_REGROWTH_CONE_RANGE_HEIGHT; d += Macro.WAND_OF_REGROWTH_CONE_RANGE_STEP_HEIGHT) {
-			double radius = d / Macro.WAND_OF_REGROWTH_CONE_RANGE_HEIGHT * Macro.WAND_OF_REGROWTH_CONE_RANGE_RADIUS;
-			double radiusSqr = radius * radius;
-			for (double x = -radius; x <= radius; x += Macro.WAND_OF_REGROWTH_CONE_RANGE_STEP_RADIUS) {
-				for (double y = -radius; y <= radius; y += Macro.WAND_OF_REGROWTH_CONE_RANGE_STEP_RADIUS) {
-
-					if (x * x + y * y > radiusSqr) {
-						continue;
-					}
-
-					Vec3 pos = origin.add(forward.scale(d)).add(right.scale(x)).add(up.scale(y));
-
-					// Spawn particles
-					spawnBlockParticles(world, pos);
-				}
-			}
-		}
+		MyModNetwork.CHANNEL.send(
+			PacketDistributor.ALL.noArg(),
+			new MagicParticlePacket(origin, forward)
+		);
 		CooldownSystem.consumeAnyEnergy(stack, 1, world);
 	}
 
-	private void spawnBlockParticles(Level world, Vec3 pos) {
-		if (!(world instanceof ServerLevel server)) return;
-
-		// generate a random number
-		double r = Math.random();
-
-		// 50% to be grass particles
-		if (r < 0.5) {
-			server.sendParticles(
-					new BlockParticleOption(ParticleTypes.BLOCK, Blocks.GRASS.defaultBlockState()),
-					pos.x, pos.y, pos.z,
-					2,
-					0.12, 0.12, 0.12,
-					0.02
-			);
-		// 30% to be leaf particles
-		} else if (r < 0.8) {
-			server.sendParticles(
-					new BlockParticleOption(ParticleTypes.BLOCK, Blocks.OAK_LEAVES.defaultBlockState()),
-					pos.x, pos.y, pos.z,
-					2,
-					0.12, 0.12, 0.12,
-					0.02
-			);
-		// 20% to be log particles
-		} else {
-			server.sendParticles(
-					new BlockParticleOption(ParticleTypes.BLOCK, Blocks.OAK_LOG.defaultBlockState()),
-					pos.x, pos.y, pos.z,
-					1,
-					0.12, 0.12, 0.12,
-					0.02
-			);
-		}
-	}
 }

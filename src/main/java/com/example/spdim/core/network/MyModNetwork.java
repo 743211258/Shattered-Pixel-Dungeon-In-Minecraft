@@ -92,5 +92,11 @@ public class MyModNetwork {
                 BlastWaveSyncPacket::handle,
                 Optional.of(NetworkDirection.PLAY_TO_CLIENT)
         );  
+        CHANNEL.registerMessage(id++, MagicParticlePacket.class,
+                MagicParticlePacket::encode,
+                MagicParticlePacket::decode,
+                MagicParticlePacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT)
+        );  
     }
 }

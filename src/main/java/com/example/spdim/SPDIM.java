@@ -42,122 +42,124 @@ import com.example.spdim.core.wand.energyWand.WandOfBlastWave;
 import com.example.spdim.core.wand.energyWand.WandOfLightning;
 import com.example.spdim.core.enchantment.Viscosity;
 import com.example.spdim.core.registry.ModEffects;
+import com.example.spdim.core.registry.ModParticles;
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(SPDIM.MODID)
 public class SPDIM
 {
-    // Define mod id in a common place for everything to reference
-    public static final String MODID = "spdim";
-    public static final DeferredRegister<EntityType<?>> ENTITY_TYPE = DeferredRegister.create(ForgeRegistries.Keys.ENTITY_TYPES, MODID);
+	// Define mod id in a common place for everything to reference
+	public static final String MODID = "spdim";
+	public static final DeferredRegister<EntityType<?>> ENTITY_TYPE = DeferredRegister.create(ForgeRegistries.Keys.ENTITY_TYPES, MODID);
 
-    public static final RegistryObject<EntityType<BlastWave>> BLAST_WAVE =
-            ENTITY_TYPE.register("blast_wave",
-                    () -> EntityType.Builder.<BlastWave>of(BlastWave::new, MobCategory.MISC)
-                            .sized(0.5f, 0.5f)
-                            .build("blast_wave"));
+	public static final RegistryObject<EntityType<BlastWave>> BLAST_WAVE =
+			ENTITY_TYPE.register("blast_wave",
+					() -> EntityType.Builder.<BlastWave>of(BlastWave::new, MobCategory.MISC)
+							.sized(0.5f, 0.5f)
+							.build("blast_wave"));
 
-    // Directly reference a slf4j logger
-    public static final Logger LOGGER = LogUtils.getLogger();
-    // Create a Deferred Register to hold Blocks which will all be registered under the "examplemod" namespace
-    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
-    // Create a Deferred Register to hold Items which will all be registered under the "examplemod" namespace
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
-    public static final DeferredRegister<Enchantment> ENCHANTMENTS = DeferredRegister.create(ForgeRegistries.ENCHANTMENTS, MODID);
+	// Directly reference a slf4j logger
+	public static final Logger LOGGER = LogUtils.getLogger();
+	// Create a Deferred Register to hold Blocks which will all be registered under the "examplemod" namespace
+	public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
+	// Create a Deferred Register to hold Items which will all be registered under the "examplemod" namespace
+	public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
+	public static final DeferredRegister<Enchantment> ENCHANTMENTS = DeferredRegister.create(ForgeRegistries.ENCHANTMENTS, MODID);
 
 		// Create a Deferred Register to hold CreativeModeTabs which will all be registered under the "examplemod" namespace
-    public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
-    // Register all wands
-    public static final RegistryObject<Item> WAND_OF_BLAST_WAVE = ITEMS.register("wand_of_blast_wave", () -> new WandOfBlastWave(new Item.Properties().stacksTo(1), 4, 1, 300, Component.translatable("item.spdim.wand_of_blast_wave")));
-    public static final RegistryObject<Item> WAND_OF_LIGHTNING = ITEMS.register("wand_of_lightning", () -> new WandOfLightning(new Item.Properties().stacksTo(1), 4, 1, 300, Component.translatable("item.spdim.wand_of_lightning")));
-    public static final RegistryObject<Item> WAND_OF_FIREBLAST = ITEMS.register("wand_of_fireblast", () -> new WandOfFireblast(new Item.Properties().stacksTo(1), 4, 1, 300, Component.translatable("item.spdim.wand_of_fireblast")));
-    public static final RegistryObject<Item> WAND_OF_REGROWTH = ITEMS.register("wand_of_regrowth", () -> new WandOfRegrowth(new Item.Properties().stacksTo(1), 4, 1, 300, Component.translatable("item.spdim.wand_of_regrowth")));
-    // Register all artifacts
-    public static final RegistryObject<Item> TIMEKEEPERS_HOURGLASS = ITEMS.register("timekeepers_hourglass", () -> new TimekeepersHourglass(new Item.Properties().stacksTo(1)));
-    public static final RegistryObject<Item> CHALICE_OF_BLOOD = ITEMS.register("chalice_of_blood", () -> new ChaliceOfBlood(new Item.Properties().stacksTo(1)));
-    public static final RegistryObject<Item> DRIED_ROSE = ITEMS.register("dried_rose", () -> new DriedRose(new Item.Properties().stacksTo(1)));
-    public static final RegistryObject<Item> MASTER_THIEVES_ARMBAND = ITEMS.register("master_thieves_armband", () -> new MasterThievesArmband(new Item.Properties().stacksTo(1)));
+	public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
+	// Register all wands
+	public static final RegistryObject<Item> WAND_OF_BLAST_WAVE = ITEMS.register("wand_of_blast_wave", () -> new WandOfBlastWave(new Item.Properties().stacksTo(1), 4, 1, 300, Component.translatable("item.spdim.wand_of_blast_wave")));
+	public static final RegistryObject<Item> WAND_OF_LIGHTNING = ITEMS.register("wand_of_lightning", () -> new WandOfLightning(new Item.Properties().stacksTo(1), 4, 1, 300, Component.translatable("item.spdim.wand_of_lightning")));
+	public static final RegistryObject<Item> WAND_OF_FIREBLAST = ITEMS.register("wand_of_fireblast", () -> new WandOfFireblast(new Item.Properties().stacksTo(1), 4, 1, 300, Component.translatable("item.spdim.wand_of_fireblast")));
+	public static final RegistryObject<Item> WAND_OF_REGROWTH = ITEMS.register("wand_of_regrowth", () -> new WandOfRegrowth(new Item.Properties().stacksTo(1), 4, 1, 300, Component.translatable("item.spdim.wand_of_regrowth")));
+	// Register all artifacts
+	public static final RegistryObject<Item> TIMEKEEPERS_HOURGLASS = ITEMS.register("timekeepers_hourglass", () -> new TimekeepersHourglass(new Item.Properties().stacksTo(1)));
+	public static final RegistryObject<Item> CHALICE_OF_BLOOD = ITEMS.register("chalice_of_blood", () -> new ChaliceOfBlood(new Item.Properties().stacksTo(1)));
+	public static final RegistryObject<Item> DRIED_ROSE = ITEMS.register("dried_rose", () -> new DriedRose(new Item.Properties().stacksTo(1)));
+	public static final RegistryObject<Item> MASTER_THIEVES_ARMBAND = ITEMS.register("master_thieves_armband", () -> new MasterThievesArmband(new Item.Properties().stacksTo(1)));
 
 		public static final RegistryObject<Enchantment> VISCOSITY = ENCHANTMENTS.register("viscosity", () -> new Viscosity());
-    // Creates a new food item with the id "examplemod:example_id", nutrition 1 and saturation 2
-    public static final RegistryObject<Item> EXAMPLE_ITEM = ITEMS.register("example_item", () -> new Item(new Item.Properties().food(new FoodProperties.Builder()
-            .alwaysEat().nutrition(1).saturationMod(2f).build())));
+	// Creates a new food item with the id "examplemod:example_id", nutrition 1 and saturation 2
+	public static final RegistryObject<Item> EXAMPLE_ITEM = ITEMS.register("example_item", () -> new Item(new Item.Properties().food(new FoodProperties.Builder()
+			.alwaysEat().nutrition(1).saturationMod(2f).build())));
 
-    // Creates a creative tab with the id "examplemod:example_tab" for the example item, that is placed after the combat tab
-    public static final RegistryObject<CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
-            .withTabsBefore(CreativeModeTabs.COMBAT)
-            .icon(() -> WAND_OF_BLAST_WAVE.get().getDefaultInstance())
-            .displayItems((parameters, output) -> {
-                output.accept(WAND_OF_BLAST_WAVE.get()); // Add the example item to the tab. For your own tabs, this method is preferred over the event
-                output.accept(WAND_OF_LIGHTNING.get());
-                output.accept(WAND_OF_FIREBLAST.get());
-                output.accept(WAND_OF_REGROWTH.get());
-                output.accept(TIMEKEEPERS_HOURGLASS.get());
-                output.accept(CHALICE_OF_BLOOD.get());
-                output.accept(DRIED_ROSE.get());
-                output.accept(MASTER_THIEVES_ARMBAND.get());
-            }).build());
-    public static final RegistryObject<Item> BLAST_WAVE_ITEM = ITEMS.register("blast_wave_item",
-            () -> new Item(new Item.Properties())
-    );
-    public SPDIM(FMLJavaModLoadingContext context)
-    {
-        IEventBus modEventBus = context.getModEventBus();
+	// Creates a creative tab with the id "examplemod:example_tab" for the example item, that is placed after the combat tab
+	public static final RegistryObject<CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
+			.withTabsBefore(CreativeModeTabs.COMBAT)
+			.icon(() -> WAND_OF_BLAST_WAVE.get().getDefaultInstance())
+			.displayItems((parameters, output) -> {
+				output.accept(WAND_OF_BLAST_WAVE.get()); // Add the example item to the tab. For your own tabs, this method is preferred over the event
+				output.accept(WAND_OF_LIGHTNING.get());
+				output.accept(WAND_OF_FIREBLAST.get());
+				output.accept(WAND_OF_REGROWTH.get());
+				output.accept(TIMEKEEPERS_HOURGLASS.get());
+				output.accept(CHALICE_OF_BLOOD.get());
+				output.accept(DRIED_ROSE.get());
+				output.accept(MASTER_THIEVES_ARMBAND.get());
+			}).build());
+	public static final RegistryObject<Item> BLAST_WAVE_ITEM = ITEMS.register("blast_wave_item",
+			() -> new Item(new Item.Properties())
+	);
+	public SPDIM(FMLJavaModLoadingContext context)
+	{
+		IEventBus modEventBus = context.getModEventBus();
 
-        // Register the commonSetup method for modloading
-        modEventBus.addListener(this::commonSetup);
+		// Register the commonSetup method for modloading
+		modEventBus.addListener(this::commonSetup);
 
-        // Register the Deferred Register to the mod event bus so blocks get registered
-        BLOCKS.register(modEventBus);
-        // Register the Deferred Register to the mod event bus so items get registered
-        ITEMS.register(modEventBus);
-        // Register the Deferred Register to the mod event bus so tabs get registered
-        ENCHANTMENTS.register(modEventBus); 
-				ModEffects.EFFECTS.register(modEventBus);
-        CREATIVE_MODE_TABS.register(modEventBus);
-        ENTITY_TYPE.register(modEventBus);
+		// Register the Deferred Register to the mod event bus so blocks get registered
+		BLOCKS.register(modEventBus);
+		// Register the Deferred Register to the mod event bus so items get registered
+		ITEMS.register(modEventBus);
+		// Register the Deferred Register to the mod event bus so tabs get registered
+		ENCHANTMENTS.register(modEventBus); 
+		ModEffects.EFFECTS.register(modEventBus);
+		ModParticles.PARTICLES.register(modEventBus);
+		CREATIVE_MODE_TABS.register(modEventBus);
+		ENTITY_TYPE.register(modEventBus);
 
 
-        // Register ourselves for server and other game events we are interested in
-        MinecraftForge.EVENT_BUS.register(this);
+		// Register ourselves for server and other game events we are interested in
+		MinecraftForge.EVENT_BUS.register(this);
 
-        // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
-        context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
-    }
+		// Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
+		context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+	}
 
-    private void commonSetup(final FMLCommonSetupEvent event)
-    {
-        // Some common setup code
-        LOGGER.info("HELLO FROM COMMON SETUP");
+	private void commonSetup(final FMLCommonSetupEvent event)
+	{
+		// Some common setup code
+		LOGGER.info("HELLO FROM COMMON SETUP");
 
-        if (Config.logDirtBlock)
-            LOGGER.info("DIRT BLOCK >> {}", ForgeRegistries.BLOCKS.getKey(Blocks.DIRT));
+		if (Config.logDirtBlock)
+			LOGGER.info("DIRT BLOCK >> {}", ForgeRegistries.BLOCKS.getKey(Blocks.DIRT));
 
-        LOGGER.info(Config.magicNumberIntroduction + Config.magicNumber);
+		LOGGER.info(Config.magicNumberIntroduction + Config.magicNumber);
 
-        Config.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
+		Config.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
 
-        MyModNetwork.register();
+		MyModNetwork.register();
 
-    }
+	}
 
-    // You can use SubscribeEvent and let the Event Bus discover methods to call
-    @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event)
-    {
-        // Do something when the server starts
-        LOGGER.info("HELLO from server starting");
-    }
+	// You can use SubscribeEvent and let the Event Bus discover methods to call
+	@SubscribeEvent
+	public void onServerStarting(ServerStartingEvent event)
+	{
+		// Do something when the server starts
+		LOGGER.info("HELLO from server starting");
+	}
 
-    // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
-    @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-    public static class ClientModEvents
-    {
-        @SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event)
-        {
-            // Some client setup code
-            LOGGER.info("HELLO FROM CLIENT SETUP");
-            LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
-        }
-    }
+	// You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
+	@Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+	public static class ClientModEvents
+	{
+		@SubscribeEvent
+		public static void onClientSetup(FMLClientSetupEvent event)
+		{
+			// Some client setup code
+			LOGGER.info("HELLO FROM CLIENT SETUP");
+			LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+		}
+	}
 }
