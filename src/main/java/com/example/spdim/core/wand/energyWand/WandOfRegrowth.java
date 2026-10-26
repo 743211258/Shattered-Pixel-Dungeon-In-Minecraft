@@ -154,7 +154,15 @@ public class WandOfRegrowth extends EnergyWand {
 		blocksData.setDirty();
 		MyModNetwork.CHANNEL.send(
 			PacketDistributor.ALL.noArg(),
-			new MagicParticlePacket(origin, forward)
+			new MagicParticlePacket(
+				origin,
+				forward,
+				new float[][] {
+					{0.0F, 0.2667F, 0.0F},
+					{0.5333F, 0.8F, 0.2667F}
+				},
+				new float[] {0.5F, 0.5F}
+			)
 		);
 		CooldownSystem.consumeAnyEnergy(stack, 1, world);
 	}

@@ -7,8 +7,8 @@ import net.minecraft.util.Mth;
 public class MagicParticle extends TextureSheetParticle {
 
     public static final float INITIAL_SIZE = 1.0F / 16.0F;
-    public static final float FINAL_SIZE = 4.0F / 16.0F;
-    public static final int LIFETIME = 40;
+    public static final float FINAL_SIZE = 2.0F / 16.0F;
+    public static final int LIFETIME = 30;
 
     private final float startRed;
     private final float startGreen;

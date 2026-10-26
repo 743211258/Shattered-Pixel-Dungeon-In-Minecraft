@@ -6,6 +6,8 @@ import java.util.Set;
 
 import com.example.spdim.core.mechanic.Invincible;
 import com.example.spdim.core.mechanic.CooldownSystem;
+import com.example.spdim.core.network.MagicParticlePacket;
+import com.example.spdim.core.network.MyModNetwork;
 import com.example.spdim.core.wand.EnergyWand;
 import com.example.spdim.core.Macro;
 import com.example.spdim.SPDIM;
@@ -28,125 +30,144 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
+import net.minecraftforge.network.PacketDistributor;
+
 import net.minecraft.util.Mth;
 
 public class WandOfFireblast extends EnergyWand {
 
-    public WandOfFireblast(Properties properties, int maxEnergy, int energyCost, int cooldown, Component name) {
-        super(properties, maxEnergy, energyCost, cooldown, name);
-    }
+	public WandOfFireblast(Properties properties, int maxEnergy, int energyCost, int cooldown, Component name) {
+		super(properties, maxEnergy, energyCost, cooldown, name);
+	}
 
-    @Override
-    protected void cast(ServerLevel world, Player player, ItemStack stack) {
-        // Only execute at server side.
-        if (world.isClientSide) {
-            return;
-        }
+	@Override
+	protected void cast(ServerLevel world, Player player, ItemStack stack) {
+		// Only execute at server side.
+		if (world.isClientSide) {
+			return;
+		}
 
-        // Cast only when the wand is charged.
-        if (!CooldownSystem.hasPositiveEnergy(stack)) {
-            return;
-        }
+		// Cast only when the wand is charged.
+		if (!CooldownSystem.hasPositiveEnergy(stack)) {
+			return;
+		}
 
-        Vec3 origin = player.getEyePosition(1.0F);
+		Vec3 origin = player.getEyePosition(1.0F);
 
-        // Build a Lookat matrix
-        Vec3 forward = player.getLookAngle().normalize();
-        Vec3 worldUp = Math.abs(forward.y) > 0.99
-                ? new Vec3(1, 0, 0)
-                : new Vec3(0, 1, 0);
-        Vec3 right = forward.cross(worldUp).normalize();
-        Vec3 up = right.cross(forward).normalize();
+		// Build a Lookat matrix
+		Vec3 forward = player.getLookAngle().normalize();
+		Vec3 worldUp = Math.abs(forward.y) > 0.99
+				? new Vec3(1, 0, 0)
+				: new Vec3(0, 1, 0);
+		Vec3 right = forward.cross(worldUp).normalize();
+		Vec3 up = right.cross(forward).normalize();
 
-        Vec3 pointOne = origin.add(forward.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT)).add(right.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_RADIUS));
-        Vec3 pointTwo = origin.add(forward.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT)).subtract(right.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_RADIUS));
-        Vec3 pointThree = origin.add(forward.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT)).add(up.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_RADIUS));
-        Vec3 pointFour = origin.add(forward.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT)).subtract(up.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_RADIUS));
+		Vec3 pointOne = origin.add(forward.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT)).add(right.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_RADIUS));
+		Vec3 pointTwo = origin.add(forward.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT)).subtract(right.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_RADIUS));
+		Vec3 pointThree = origin.add(forward.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT)).add(up.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_RADIUS));
+		Vec3 pointFour = origin.add(forward.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT)).subtract(up.scale(Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_RADIUS));
 
-        double minX = Math.min(Math.min(Math.min(Math.min(origin.x, pointOne.x), pointTwo.x), pointThree.x), pointFour.x);
-        double minY = Math.min(Math.min(Math.min(Math.min(origin.y, pointOne.y), pointTwo.y), pointThree.y), pointFour.y);
-        double minZ = Math.min(Math.min(Math.min(Math.min(origin.z, pointOne.z), pointTwo.z), pointThree.z), pointFour.z);
+		double minX = Math.min(Math.min(Math.min(Math.min(origin.x, pointOne.x), pointTwo.x), pointThree.x), pointFour.x);
+		double minY = Math.min(Math.min(Math.min(Math.min(origin.y, pointOne.y), pointTwo.y), pointThree.y), pointFour.y);
+		double minZ = Math.min(Math.min(Math.min(Math.min(origin.z, pointOne.z), pointTwo.z), pointThree.z), pointFour.z);
 
-        double maxX = Math.max(Math.max(Math.max(Math.max(origin.x, pointOne.x), pointTwo.x), pointThree.x), pointFour.x);
-        double maxY = Math.max(Math.max(Math.max(Math.max(origin.y, pointOne.y), pointTwo.y), pointThree.y), pointFour.y);
-        double maxZ = Math.max(Math.max(Math.max(Math.max(origin.z, pointOne.z), pointTwo.z), pointThree.z), pointFour.z);
+		double maxX = Math.max(Math.max(Math.max(Math.max(origin.x, pointOne.x), pointTwo.x), pointThree.x), pointFour.x);
+		double maxY = Math.max(Math.max(Math.max(Math.max(origin.y, pointOne.y), pointTwo.y), pointThree.y), pointFour.y);
+		double maxZ = Math.max(Math.max(Math.max(Math.max(origin.z, pointOne.z), pointTwo.z), pointThree.z), pointFour.z);
 
-        AABB box = new AABB(minX, minY, minZ, maxX, maxY, maxZ);
+		AABB box = new AABB(minX, minY, minZ, maxX, maxY, maxZ);
 
-        // Detect for living entities
-        List<LivingEntity> entities = world.getEntitiesOfClass(
-                LivingEntity.class,
-                box,
-                e -> {
-                    if (e == player ||
-                            Invincible.isInvincible(e)) {
-                        return false;
-                    }
-                    Vec3 vectorFromOriginToEntity = e.position().subtract(origin);
-                    double projectionLength = vectorFromOriginToEntity.dot(forward);
-                    if (projectionLength <= 0 || projectionLength > Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT) {
-                        return false;
-                    }
-                    double verticalLengthFromEntityToProjectionSqr = vectorFromOriginToEntity.lengthSqr() - (projectionLength * projectionLength);
-                    double radiusAtSamePlane = projectionLength / Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT * Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_RADIUS;
-                    return (verticalLengthFromEntityToProjectionSqr <= radiusAtSamePlane * radiusAtSamePlane);
-                }
-        );
+		// Detect for living entities
+		List<LivingEntity> entities = world.getEntitiesOfClass(
+				LivingEntity.class,
+				box,
+				e -> {
+					if (e == player ||
+							Invincible.isInvincible(e)) {
+						return false;
+					}
+					Vec3 vectorFromOriginToEntity = e.position().subtract(origin);
+					double projectionLength = vectorFromOriginToEntity.dot(forward);
+					if (projectionLength <= 0 || projectionLength > Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT) {
+						return false;
+					}
+					double verticalLengthFromEntityToProjectionSqr = vectorFromOriginToEntity.lengthSqr() - (projectionLength * projectionLength);
+					double radiusAtSamePlane = projectionLength / Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT * Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_RADIUS;
+					return (verticalLengthFromEntityToProjectionSqr <= radiusAtSamePlane * radiusAtSamePlane);
+				}
+		);
 
-        for (double d = 0; d <= Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT; d += Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_STEP_HEIGHT) {
-            double radius = d / Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT * Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_RADIUS;
-            double radiusSqr = radius * radius;
-            for (double x = -radius; x <= radius; x += Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_STEP_RADIUS) {
-                for (double y = -radius; y <= radius; y += Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_STEP_RADIUS) {
+		MyModNetwork.CHANNEL.send(
+			PacketDistributor.ALL.noArg(),
+			new MagicParticlePacket(
+				origin,
+				forward,
+				new float[][] {
+					{0.7216F, 0.1961F, 0.0706F}, // #B83212
+					{0.9020F, 0.3255F, 0.1176F}, // #E6531E
+					{0.9882F, 0.4706F, 0.0706F}, // #FC7812
+					{1.0000F, 0.7882F, 0.2902F}  // #FFC94A
+				},
+				new float[] {
+					0.10F,
+					0.25F,
+					0.45F,
+					0.20F
+				}
+			)
+		);
 
-                    if (radius == 0 || x * x + y * y > radiusSqr) {
-                        continue;
-                    }
+		for (double d = 0; d <= Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT; d += Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_STEP_HEIGHT) {
+			double radius = d / Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_HEIGHT * Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_RADIUS;
+			double radiusSqr = radius * radius;
+			for (double x = -radius; x <= radius; x += Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_STEP_RADIUS) {
+				for (double y = -radius; y <= radius; y += Macro.WAND_OF_FIRE_BLAST_CONE_RANGE_STEP_RADIUS) {
 
-                    Vec3 pos = origin.add(forward.scale(d)).add(right.scale(x)).add(up.scale(y));
+					if (radius == 0 || x * x + y * y > radiusSqr) {
+						continue;
+					}
 
-                    // Spawn fire particles
-                    spawnFireParticles(world, pos);
+					Vec3 pos = origin.add(forward.scale(d)).add(right.scale(x)).add(up.scale(y));
 
-                    // Ignite any block surface
-                    BlockPos blockPos = BlockPos.containing(pos);
+					// Ignite any block surface
+					BlockPos blockPos = BlockPos.containing(pos);
 
-                    BlockState state = world.getBlockState(blockPos);
+					BlockState state = world.getBlockState(blockPos);
 
-                    // Air is not ignitable.
-                    if (state.isAir()) {
-                        continue;
-                    }
+					// Air is not ignitable.
+					if (state.isAir()) {
+						continue;
+					}
 
-                    tryIgniteSurface(world, blockPos);
-                }
-            }
-        }
-        CooldownSystem.consumeAnyEnergy(stack, 1, world);
-    }
+					tryIgniteSurface(world, blockPos);
+				}
+			}
+		}
+		CooldownSystem.consumeAnyEnergy(stack, 1, world);
+	}
 
-    private void tryIgniteSurface(Level world, BlockPos pos) {
-        // Get all surfaces of a block
-        Direction[] dirs = Direction.values();
+	private void tryIgniteSurface(Level world, BlockPos pos) {
+		// Get all surfaces of a block
+		Direction[] dirs = Direction.values();
 
-        for (Direction dir : dirs) {
-            BlockPos firePos = pos.relative(dir);
-            if (world.isEmptyBlock(firePos)) {
-                world.setBlock(firePos, Blocks.FIRE.defaultBlockState(), 11);
-            }
-        }
-    }
+		for (Direction dir : dirs) {
+			BlockPos firePos = pos.relative(dir);
+			if (world.isEmptyBlock(firePos)) {
+				world.setBlock(firePos, Blocks.FIRE.defaultBlockState(), 11);
+			}
+		}
+	}
 
-    private void spawnFireParticles(Level world, Vec3 pos) {
-        if (!(world instanceof ServerLevel server)) return;
+	private void spawnFireParticles(Level world, Vec3 pos) {
+		if (!(world instanceof ServerLevel server)) return;
 
-        server.sendParticles(
-                ParticleTypes.FLAME,
-                pos.x, pos.y, pos.z,
-                1,
-                0.12, 0.12, 0.12,
-                0.02
-        );
-    }
+		server.sendParticles(
+				ParticleTypes.FLAME,
+				pos.x, pos.y, pos.z,
+				1,
+				0.12, 0.12, 0.12,
+				0.02
+		);
+	}
 
 }
