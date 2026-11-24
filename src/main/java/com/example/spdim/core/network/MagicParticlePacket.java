@@ -1,11 +1,13 @@
 package com.example.spdim.core.network;
 
 import com.example.spdim.core.renderer.MagicParticleRenderer;
+import com.example.spdim.core.functions.Functions;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
+import java.util.List;
 
 public class MagicParticlePacket {
 
@@ -78,12 +80,15 @@ public class MagicParticlePacket {
 			Supplier<NetworkEvent.Context> ctx
 	) {
 		ctx.get().enqueueWork(() -> {
-			MagicParticleRenderer.render(
-					msg.origin,
-					msg.forward,
-					msg.colors,
-					msg.weights
+			List<Vec3> pos_list = Functions.generateConePositions(msg.origin, msg.forward);
+
+			List<float[]> color_list = Functions.generateRandomColors(
+				pos_list.size(),
+				msg.colors,
+				msg.weights
 			);
+
+			MagicParticleRenderer.render(pos_list, color_list);
 		});
 
 		ctx.get().setPacketHandled(true);

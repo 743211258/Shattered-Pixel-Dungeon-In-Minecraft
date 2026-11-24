@@ -9,6 +9,7 @@ import com.example.spdim.core.network.BlastWaveSyncPacket;
 
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -28,6 +29,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import net.minecraft.world.phys.*;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 
 import net.minecraftforge.network.PacketDistributor;
@@ -96,7 +98,7 @@ public class BlastWave extends ThrowableProjectile implements ItemSupplier{
     }
 
 
-    @Override
+/*    @Override
     public void tick() {
         super.tick();
 
@@ -118,6 +120,7 @@ public class BlastWave extends ThrowableProjectile implements ItemSupplier{
         if (!projectiles.isEmpty()) {
             for (Projectile proj : projectiles) {
                 if (proj instanceof BlastWave wave) {
+                    System.out.println("projectile hit an entity");
                     explode(wave.position());
                 }
 
@@ -126,13 +129,95 @@ public class BlastWave extends ThrowableProjectile implements ItemSupplier{
             }
             explode(this.position());
         }
+    }*/
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        // Maximum distance is 100 blocks
+        if (this.tickCount > 100) {
+            explode(this.position());
+            return;
+        }
+
+        // Explode when it touches liquid
+        if (this.isInWaterOrBubble() || this.isInLava()) {
+            explode(this.position());
+            return;
+        }
+
+        // Projectile collision detection
+        if (!(this.level() instanceof ServerLevel serverLevel)) {
+            return;
+        }
+
+        AABB startBox = this.getBoundingBox();
+        Vec3 startPos = this.position();
+        Vec3 movement = this.getDeltaMovement();
+
+        List<Entity> entities = new java.util.ArrayList<>();
+
+        for (Entity entity : serverLevel.getAllEntities()) {
+        if (entity != this && ((entity instanceof LivingEntity && this.canHitEntity(entity)) || entity instanceof Projectile)) {
+                entities.add(entity);
+            }
+        }
+
+        System.out.println(entities.size());
+
+        for (Entity entity : entities) {
+    if (entity instanceof Projectile) {
+        System.out.println(
+            "PROJECTILE FOUND: "
+            + entity.getClass().getName()
+            + " ID=" + entity.getId()
+            + " Alive=" + entity.isAlive()
+            + " CanBeHit=" + entity.canBeHitByProjectile()
+        );
+    }
+            AABB targetBox = entity.getBoundingBox();
+            Vec3 targetMovement = entity.getDeltaMovement();
+
+            double time = getCollisionTime(
+                    startBox,
+                    movement,
+                    targetBox,
+                    targetMovement
+            );
+
+            if (time == -1) {
+                continue;
+            }
+
+            // Calculate both AABBs at collision time
+            AABB projectileHitBox = startBox.move(movement.scale(time));
+            AABB entityHitBox = targetBox.move(targetMovement.scale(time));
+
+            // Calculate both centers
+            Vec3 projectileCenter = projectileHitBox.getCenter();
+            Vec3 entityCenter = entityHitBox.getCenter();
+
+            // Move the blast wave to the entity center
+            this.setPos(entityCenter.x, entityCenter.y, entityCenter.z);
+
+            if (entity instanceof Projectile) {
+                System.out.println("Projectile collided");
+                entity.discard();
+            } else {
+                // Move the entity to its collision center
+                entity.setPos(entityCenter.x, entityCenter.y, entityCenter.z);
+            }
+
+            // Explode at the projectile's collision center
+            explode(projectileCenter);
+            return;
+        }
     }
 
     @Override
     protected void onHit(HitResult result) {
-        if (!this.level().isClientSide) {
-            explode(result.getLocation());
-        }
+        super.onHit(result);
     }
 
     @Override
@@ -144,12 +229,15 @@ public class BlastWave extends ThrowableProjectile implements ItemSupplier{
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
-        if (!this.level().isClientSide) {
-            explode(result.getLocation());
-        }
     }
     
     public void explode(Vec3 pos) {
+System.out.printf(
+    "[EXPLODE] waveId=%d tick=%d pos=%s%n",
+    this.getId(),
+    this.tickCount,
+    pos
+);
         if (this.level().isClientSide) {
             return;
         }
@@ -200,6 +288,12 @@ public class BlastWave extends ThrowableProjectile implements ItemSupplier{
             } else {
                 entity.setDeltaMovement(entity.getDeltaMovement().add(pushForce));
             }
+        System.out.printf(
+    "[TARGET] waveId=%d targetId=%d speed=%s%n",
+    this.getId(),
+    entity.getId(),
+    entity.getDeltaMovement()
+);
         }
         sendShockwaveParticles();
         this.discard();
@@ -237,5 +331,57 @@ public class BlastWave extends ThrowableProjectile implements ItemSupplier{
         Vec3 look = target.getLookAngle().normalize();
         double dot = direction.dot(look);
         return dot > 0.5;
+    }
+    private double getCollisionTime(
+            AABB a,
+            Vec3 velocityA,
+            AABB b,
+            Vec3 velocityB
+    ) {
+        Vec3 d = velocityA.subtract(velocityB);
+
+        double[] min = {
+            b.minX - a.maxX,
+            b.minY - a.maxY,
+            b.minZ - a.maxZ
+        };
+
+        double[] max = {
+            b.maxX - a.minX,
+            b.maxY - a.minY,
+            b.maxZ - a.minZ
+        };
+
+        double[] movement = { d.x, d.y, d.z };
+
+        double tEnter = Double.NEGATIVE_INFINITY;
+        double tExit = Double.POSITIVE_INFINITY;
+
+        for (int i = 0; i < 3; i++) {
+            double v = movement[i];
+
+            if (v == 0.0) {
+                if (min[i] > 0 || max[i] < 0) {
+                    return -1;
+                }
+                continue;
+            }
+
+            double t1 = min[i] / v;
+            double t2 = max[i] / v;
+
+            tEnter = Math.max(tEnter, Math.min(t1, t2));
+            tExit = Math.min(tExit, Math.max(t1, t2));
+
+            if (tEnter > tExit) {
+                return -1;
+            }
+        }
+
+        if (tExit < 0 || tEnter > 1) {
+            return -1;
+        }
+
+        return Math.max(0, tEnter);
     }
 }
