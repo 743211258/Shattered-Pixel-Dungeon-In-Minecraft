@@ -260,8 +260,6 @@ System.out.printf(
             if (entity instanceof LivingEntity livingEntity) {
                 magnitude = livingEntity.getAttributeValue(Attributes.ARMOR);
             }
-            DamageSource source = entity.level().damageSources().explosion(this, getOwner());
-            entity.hurt(source, (float) (2.0D + magnitude * Macro.BLAST_WAVE_DAMAGE_MULTIPLIER));
             Vec3 direction = entity.position().subtract(pos);
             double radius = direction.length();
             if (radius > explodeRadius) {
@@ -273,6 +271,8 @@ System.out.printf(
             }
             double factor = Math.max(0, 1.0 - ((radius / explodeRadius) * (radius / explodeRadius)));
             Vec3 pushForce = direction.normalize().scale((float) ((10.0D - Macro.BLAST_WAVE_KNOCKBACK_MULTIPLIER * magnitude) * factor));
+            DamageSource source = entity.level().damageSources().explosion(this, getOwner());
+            entity.hurt(source, (float) ((2.0D + magnitude * Macro.BLAST_WAVE_DAMAGE_MULTIPLIER) * factor));
             if (isBlockedByBlock(pos, entity)) {
                 pushForce = pushForce.scale(0.2);
             }

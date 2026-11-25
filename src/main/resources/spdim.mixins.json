@@ -3,9 +3,12 @@
   "package": "com.example.spdim.core.mixin",
   "compatibilityLevel": "JAVA_17",
   "refmap": "spdim.refmap.json",
+  "mixins": [
+    "CollisionFreezeServerMixin"
+  ],
   "client": [
     "ViscosityMixin",
-    "CollisionFreezeMixin"
+    "CollisionFreezeClientMixin"
   ],
   "injectors": {
     "defaultRequire": 1

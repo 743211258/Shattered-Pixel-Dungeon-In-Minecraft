@@ -7,7 +7,7 @@ public class Macro {
 		COOLDOWN
 	}
 
-	public static final float BLAST_WAVE_DAMAGE_MULTIPLIER = 1.0F;
+	public static final float BLAST_WAVE_DAMAGE_MULTIPLIER = 0.5F;
 
 	public static final float BLAST_WAVE_KNOCKBACK_MULTIPLIER = 0.2F;
 	

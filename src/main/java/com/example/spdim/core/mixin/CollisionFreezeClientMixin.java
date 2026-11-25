@@ -25,7 +25,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import org.objectweb.asm.Opcodes;
 
 @Mixin(Entity.class)
-public abstract class CollisionFreezeMixin {
+public abstract class CollisionFreezeClientMixin {
 
 	@Unique
 	private Vec3 spdim$preCollisionMovement;
