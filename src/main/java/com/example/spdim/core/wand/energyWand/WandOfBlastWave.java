@@ -40,6 +40,10 @@ public class WandOfBlastWave extends EnergyWand{
 
 				// Set the speed
 				blastWave.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, Macro.WAND_OF_BLAST_WAVE_SPEED, 0.0F);
+				Vec3 velocity = blastWave.getDeltaMovement();
+
+				blastWave.setDeltaMovement(velocity.subtract(player.getDeltaMovement()));
+
 				blastWave.hasImpulse = true;
 			});
 

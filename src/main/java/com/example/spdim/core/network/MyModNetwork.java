@@ -74,6 +74,12 @@ public class MyModNetwork {
                 StealPacket::handle,
                 Optional.of(NetworkDirection.PLAY_TO_SERVER)
         );
+        CHANNEL.registerMessage(id++, CollisionFreezePacket.class,
+                CollisionFreezePacket::encode,
+                CollisionFreezePacket::decode,
+                CollisionFreezePacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER)
+        );
         CHANNEL.registerMessage(id++, SyncViscosityPacket.class,
                 SyncViscosityPacket::encode,
                 SyncViscosityPacket::decode,

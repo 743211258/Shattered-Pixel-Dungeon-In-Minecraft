@@ -340,6 +340,5 @@ public class ClientEvents {
             }
             gui.pose().popPose();
         }
- 
     }
 }

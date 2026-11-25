@@ -76,7 +76,7 @@ public class ServerEvents {
 		}
 
 		CompoundTag data = event.getEntity().getPersistentData();
-				MixinReference.renderReference.remove(event.getEntity().getUUID());
+		MixinReference.renderReference.remove(event.getEntity().getUUID());
 		data.remove("totalDamage");
 		data.remove("ViscosityTick");
 	}
